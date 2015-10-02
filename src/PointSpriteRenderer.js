@@ -91,8 +91,8 @@ Renderable.prototype.add = function(geometry)
 	this.geometry2vb[ geometry.gid ] = this.vertices.length;
 	// TODO: Find a better way to access to coordinate system
 	var pt = this.bucket.renderer.globe.coordinateSystem.fromGeoTo3D( geometry['coordinates'] );
-	// Hack : push away/abroad the point depending on globe type
-	var scale = this.bucket.renderer.globe.isSky ? 0.99 : 1.01;
+	var planetRadius = this.bucket.renderer.globe.coordinateSystem.realEarthRadius;
+	var scale = this.bucket.renderer.globe.isSky ? 0.985 : this.bucket.renderer.globe.getElevation(geometry['coordinates'][0],geometry['coordinates'][1])/planetRadius+1.0015;
 	this.vertices.push( scale * pt[0], scale * pt[1], scale * pt[2] );
 	this.vertexBufferDirty = true;
 	
