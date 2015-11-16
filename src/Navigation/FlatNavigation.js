@@ -17,166 +17,157 @@
  * along with GlobWeb. If not, see <http://www.gnu.org/licenses/>.
  ***************************************/
 
- define(['./Utils', './BaseNavigation', './Ray', './glMatrix'],
-  function(Utils,BaseNavigation,Ray) {
+define(['../Utils/Utils', './BaseNavigation', '../Renderer/Ray', '../Renderer/glMatrix'],
+    function (Utils, BaseNavigation, Ray) {
 
-/**************************************************************************************************************/
+        /**************************************************************************************************************/
 
-/** @name FlatNavigation
-	@class
-	Manages the navigation in the Globe in flat mode.
-	@augments BaseNavigation
-	
-	@param globe Globe
-	@param options Configuration properties for the FlatNavigation :
-		<ul>
-			<li>minDistance : The minimum distance</li>
-			<li>maxDistance : The maximum distance</li>
-		</ul>
- */
-var FlatNavigation = function(globe,options)
-{
-	BaseNavigation.prototype.constructor.call( this, globe.renderContext, options );
+        /** @name FlatNavigation
+         @class
+             Manages the navigation in the Globe in flat mode.
+         @augments BaseNavigation
 
-	this.globe = globe;
-		
-	// Default values for min and max distance (in meter)
-	this.minDistance = (options && options.minDistance) || 0.01;
-	this.maxDistance = (options && options.maxDistance) || 7.0;
-	
-	// Initialize the navigation
-	this.geoCenter = [0.0, 0.0, 0.0];
-	this.distance = 7.0 * this.globe.coordinateSystem.radius;
-	this.up = [0., 1., 0.];
-	this.eye = [0.0, 0.0, this.distance];
-	
-	this.computeViewMatrix();
+         @param globe Globe
+         @param options Configuration properties for the FlatNavigation :
+         <ul>
+         <li>minDistance : The minimum distance</li>
+         <li>maxDistance : The maximum distance</li>
+         </ul>
+         */
+        var FlatNavigation = function (globe, options) {
+            BaseNavigation.prototype.constructor.call(this, globe.renderContext, options);
 
-}
+            this.globe = globe;
 
-/**************************************************************************************************************/
+            // Default values for min and max distance (in meter)
+            this.minDistance = (options && options.minDistance) || 0.01;
+            this.maxDistance = (options && options.maxDistance) || 7.0;
 
-Utils.inherits( BaseNavigation,FlatNavigation );
+            // Initialize the navigation
+            this.geoCenter = [0.0, 0.0, 0.0];
+            this.distance = 7.0 * this.globe.coordinateSystem.radius;
+            this.up = [0., 1., 0.];
+            this.eye = [0.0, 0.0, this.distance];
 
-/**************************************************************************************************************/
+            this.computeViewMatrix();
 
-/** 
-	Save the current navigation state.
-	@return a JS object containing the navigation state
-*/
-FlatNavigation.prototype.save = function()
-{
-	return {
-		geoCenter: this.geoCenter,
-		eye: this.eye,
-		up: this.up
-	};
-}
+        }
 
-/**************************************************************************************************************/
+        /**************************************************************************************************************/
 
-/** 
-	Restore the navigation state.
-	@param state a JS object containing the navigation state
-*/
-FlatNavigation.prototype.restore = function(state)
-{
-	this.geoCenter = state.geoCenter;
-	this.eye = state.eye;
-	this.up = state.up;
-	this.computeViewMatrix();
-}
+        Utils.inherits(BaseNavigation, FlatNavigation);
 
-/**************************************************************************************************************/
+        /**************************************************************************************************************/
 
-/**
-	Compute the view matrix
- */
-FlatNavigation.prototype.computeViewMatrix = function()
-{
-	var eye = [];
-	//vec3.normalize(this.geoCenter);
-	var vm = this.renderContext.viewMatrix;
+        /**
+         Save the current navigation state.
+         @return a JS object containing the navigation state
+         */
+        FlatNavigation.prototype.save = function () {
+            return {
+                geoCenter: this.geoCenter,
+                eye: this.eye,
+                up: this.up
+            };
+        }
 
-	mat4.lookAt( this.eye, this.geoCenter, this.up, vm );
-	this.up = [ vm[1], vm[5], vm[9] ];
-	this.publish("modified");
-	this.renderContext.requestFrame();
-}
+        /**************************************************************************************************************/
 
-/**************************************************************************************************************/
+        /**
+         Restore the navigation state.
+         @param state a JS object containing the navigation state
+         */
+        FlatNavigation.prototype.restore = function (state) {
+            this.geoCenter = state.geoCenter;
+            this.eye = state.eye;
+            this.up = state.up;
+            this.computeViewMatrix();
+        }
 
-/**
-	Zoom to the current observed location
-	@param delta Delta zoom
- */
-FlatNavigation.prototype.zoom = function(delta,scale)
-{
-	var previousDistance = this.eye[2];
-	
-	// TODO : improve zoom, using scale or delta ? We should use scale always
-	if (scale)
-		this.distance *= scale;
-	else
-		this.distance *= (1 + delta * 0.1);
-		
-	if ( this.distance > this.maxDistance )
-	{
-		this.distance = this.maxDistance;
-	}
-	if ( this.distance < this.minDistance )
-	{
-		this.distance = this.minDistance;
-	}
+        /**************************************************************************************************************/
 
-	// Update eye depending on distance : remove distance attribute ?
-	this.eye[2] = this.distance;
+        /**
+         Compute the view matrix
+         */
+        FlatNavigation.prototype.computeViewMatrix = function () {
+            var eye = [];
+            //vec3.normalize(this.geoCenter);
+            var vm = this.renderContext.viewMatrix;
 
-	this.computeViewMatrix();
-}
+            mat4.lookAt(this.eye, this.geoCenter, this.up, vm);
+            this.up = [vm[1], vm[5], vm[9]];
+            this.publish("modified");
+            this.renderContext.requestFrame();
+        }
 
-/**************************************************************************************************************/
+        /**************************************************************************************************************/
 
-/**
-	Pan the navigation
-	@param dx Window delta x
-	@param dy Window delta y
-*/
-FlatNavigation.prototype.pan = function(dx, dy)
-{
-	var x = this.renderContext.canvas.width / 2.;
-	var y = this.renderContext.canvas.height / 2.;
+        /**
+         Zoom to the current observed location
+         @param delta Delta zoom
+         */
+        FlatNavigation.prototype.zoom = function (delta, scale) {
+            var previousDistance = this.eye[2];
 
-	var ray = Ray.createFromPixel(this.renderContext, x - dx, y - dy);
-	this.geoCenter = ray.computePoint( ray.planeIntersect( [0,0,0], [0,0,1] ) );
-	vec3.subtract(this.geoCenter, [0,0,-this.distance], this.eye);
-		
-	this.computeViewMatrix();
-}
+            // TODO : improve zoom, using scale or delta ? We should use scale always
+            if (scale)
+                this.distance *= scale;
+            else
+                this.distance *= (1 + delta * 0.1);
 
-/**************************************************************************************************************/
+            if (this.distance > this.maxDistance) {
+                this.distance = this.maxDistance;
+            }
+            if (this.distance < this.minDistance) {
+                this.distance = this.minDistance;
+            }
 
-/**
-	Rotate the navigation
-	@param dx Window delta x
-	@param dy Window delta y
- */
-FlatNavigation.prototype.rotate = function(dx,dy)
-{
-	// Constant tiny angle 
-	var angle = -dx * 0.1 * Math.PI/180.;
+            // Update eye depending on distance : remove distance attribute ?
+            this.eye[2] = this.distance;
 
-	var axe = vec3.create();
-	vec3.subtract(this.geoCenter, this.eye, axe);
-	vec3.normalize(axe);
-	var rot = quat4.fromAngleAxis(angle,axe);
-	quat4.multiplyVec3( rot, this.up );
-	
-	this.computeViewMatrix();
-}
+            this.computeViewMatrix();
+        }
 
-/**************************************************************************************************************/
+        /**************************************************************************************************************/
 
-return FlatNavigation;
+        /**
+         Pan the navigation
+         @param dx Window delta x
+         @param dy Window delta y
+         */
+        FlatNavigation.prototype.pan = function (dx, dy) {
+            var x = this.renderContext.canvas.width / 2.;
+            var y = this.renderContext.canvas.height / 2.;
 
-});
+            var ray = Ray.createFromPixel(this.renderContext, x - dx, y - dy);
+            this.geoCenter = ray.computePoint(ray.planeIntersect([0, 0, 0], [0, 0, 1]));
+            vec3.subtract(this.geoCenter, [0, 0, -this.distance], this.eye);
+
+            this.computeViewMatrix();
+        }
+
+        /**************************************************************************************************************/
+
+        /**
+         Rotate the navigation
+         @param dx Window delta x
+         @param dy Window delta y
+         */
+        FlatNavigation.prototype.rotate = function (dx, dy) {
+            // Constant tiny angle
+            var angle = -dx * 0.1 * Math.PI / 180.;
+
+            var axe = vec3.create();
+            vec3.subtract(this.geoCenter, this.eye, axe);
+            vec3.normalize(axe);
+            var rot = quat4.fromAngleAxis(angle, axe);
+            quat4.multiplyVec3(rot, this.up);
+
+            this.computeViewMatrix();
+        }
+
+        /**************************************************************************************************************/
+
+        return FlatNavigation;
+
+    });

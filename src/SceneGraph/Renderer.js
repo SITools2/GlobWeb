@@ -17,16 +17,15 @@
  * along with GlobWeb. If not, see <http://www.gnu.org/licenses/>.
  ***************************************/
 
-define(['../Program','../glMatrix'], function(Program) {
- 
-/**************************************************************************************************************/
+define(['../Renderer/Program', '../Renderer/glMatrix'], function (Program) {
 
-/**
- *	@constructor SceneGraph Renderer
- */
-var SceneGraphRenderer = function(renderContext,node)
-{
-	var vertexShader = "\
+    /**************************************************************************************************************/
+
+    /**
+     *    @constructor SceneGraph Renderer
+     */
+    var SceneGraphRenderer = function (renderContext, node) {
+        var vertexShader = "\
 	attribute vec3 vertex; \n\
 	attribute vec2 tcoord; \n\
 	uniform mat4 modelViewMatrix;\n\
@@ -39,8 +38,8 @@ var SceneGraphRenderer = function(renderContext,node)
 		texCoord = tcoord; \n\
 	} \n\
 	";
-	
-	var fragmentShader = "\
+
+        var fragmentShader = "\
 	precision lowp float; \n\
 	varying vec2 texCoord; \n\
 	uniform vec4 diffuse; \n\
@@ -51,91 +50,85 @@ var SceneGraphRenderer = function(renderContext,node)
 		gl_FragColor = diffuse * texture2D(texture, texCoord); \n\
 	} \n\
 	";
-	
-	var gl = renderContext.gl;
-	this.defaultTexture = gl.createTexture();
-	gl.bindTexture(gl.TEXTURE_2D, this.defaultTexture);
-	var whitePixel = new Uint8Array([255, 255, 255, 255]);
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, whitePixel);
 
-	this.renderContext = renderContext;
-	
-	this.program = new Program(renderContext);
-	this.program.createFromSource(vertexShader,fragmentShader);
-	this.nodes = [];
-	if ( node )
-	{
-		this.nodes.push( node );
-	}
-	
-	this.matrixStack = [];
-	
-	renderContext.minNear = 0.1;
-	renderContext.far = 5000;
-	renderContext.fov = 60;
-	
-	renderContext.renderer = this;
-	renderContext.requestFrame();	
-}
+        var gl = renderContext.gl;
+        this.defaultTexture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, this.defaultTexture);
+        var whitePixel = new Uint8Array([255, 255, 255, 255]);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, whitePixel);
 
-/**************************************************************************************************************/
+        this.renderContext = renderContext;
 
-/**
- *	Recursive method to render node
- */
-SceneGraphRenderer.prototype.renderNode = function(node,parent)
-{
-	var rc = this.renderContext;
-	var gl = rc.gl;
-	
-	if (node.matrix)
-	{
-		var mat = mat4.create();
-		mat4.set( this.matrixStack[ this.matrixStack.length-1 ], mat );
-		mat4.multiply(mat, node.matrix);
-		this.matrixStack.push( mat );
-	}
-	
-	node.render(this);
-	
-	if (node.matrix)
-	{
-		this.matrixStack.length = this.matrixStack.length-1;
-	}
-}
+        this.program = new Program(renderContext);
+        this.program.createFromSource(vertexShader, fragmentShader);
+        this.nodes = [];
+        if (node) {
+            this.nodes.push(node);
+        }
 
-/**************************************************************************************************************/
+        this.matrixStack = [];
 
-/**
- *	Main render
- */
-SceneGraphRenderer.prototype.render = function()
-{
-	var rc = this.renderContext;
-	var gl = rc.gl;
-	
-	gl.disable(gl.CULL_FACE);
-	gl.enable(gl.DEPTH_TEST);
-	gl.depthFunc(gl.LESS);
-	gl.activeTexture(gl.TEXTURE0);
+        renderContext.minNear = 0.1;
+        renderContext.far = 5000;
+        renderContext.fov = 60;
 
-	// Setup program
-	this.program.apply();
-		
-	gl.uniformMatrix4fv( this.program.uniforms["projectionMatrix"], false, rc.projectionMatrix);
-	gl.uniform1i(this.program.uniforms["texture"], 0);
-	
-	this.matrixStack.length = 0;
-	this.matrixStack.push( rc.viewMatrix );
-	
-	for ( var i = 0; i < this.nodes.length; i++ )
-	{
-		this.renderNode(this.nodes[i]);
-	}
-}
+        renderContext.renderer = this;
+        renderContext.requestFrame();
+    }
 
-/**************************************************************************************************************/
+    /**************************************************************************************************************/
 
-return SceneGraphRenderer;
+    /**
+     *    Recursive method to render node
+     */
+    SceneGraphRenderer.prototype.renderNode = function (node, parent) {
+        var rc = this.renderContext;
+        var gl = rc.gl;
+
+        if (node.matrix) {
+            var mat = mat4.create();
+            mat4.set(this.matrixStack[this.matrixStack.length - 1], mat);
+            mat4.multiply(mat, node.matrix);
+            this.matrixStack.push(mat);
+        }
+
+        node.render(this);
+
+        if (node.matrix) {
+            this.matrixStack.length = this.matrixStack.length - 1;
+        }
+    }
+
+    /**************************************************************************************************************/
+
+    /**
+     *    Main render
+     */
+    SceneGraphRenderer.prototype.render = function () {
+        var rc = this.renderContext;
+        var gl = rc.gl;
+
+        gl.disable(gl.CULL_FACE);
+        gl.enable(gl.DEPTH_TEST);
+        gl.depthFunc(gl.LESS);
+        gl.activeTexture(gl.TEXTURE0);
+
+        // Setup program
+        this.program.apply();
+
+        gl.uniformMatrix4fv(this.program.uniforms["projectionMatrix"], false, rc.projectionMatrix);
+        gl.uniform1i(this.program.uniforms["texture"], 0);
+
+        this.matrixStack.length = 0;
+        this.matrixStack.push(rc.viewMatrix);
+
+        for (var i = 0; i < this.nodes.length; i++) {
+            this.renderNode(this.nodes[i]);
+        }
+    }
+
+    /**************************************************************************************************************/
+
+    return SceneGraphRenderer;
 
 });

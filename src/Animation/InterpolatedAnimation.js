@@ -17,93 +17,87 @@
  * along with GlobWeb. If not, see <http://www.gnu.org/licenses/>.
  ***************************************/
 
-define(['./Utils','./Animation'], function(Utils,Animation) {
+define(['../Utils/Utils', './Animation'], function (Utils, Animation) {
 
-/**************************************************************************************************************/
+    /**************************************************************************************************************/
 
-/** @constructor
-  Generic animation to interpolate arbitrary values
-  The animation will interpolate between startValue and endValue, using the
-  interpolateFunction(t, startValue, endValue) (t [0,1])
-  The interpolated value is then given to the setFunction(value)
-  */
-var InterpolatedAnimation = function(duration, startValue, endValue, interpolationFunction, setFunction)
-{
-    // Call ancestor constructor
-    Animation.prototype.constructor.call(this);
+    /** @constructor
+     Generic animation to interpolate arbitrary values
+     The animation will interpolate between startValue and endValue, using the
+     interpolateFunction(t, startValue, endValue) (t [0,1])
+     The interpolated value is then given to the setFunction(value)
+     */
+    var InterpolatedAnimation = function (duration, startValue, endValue, interpolationFunction, setFunction) {
+        // Call ancestor constructor
+        Animation.prototype.constructor.call(this);
 
-    this.values = [[0.0, startValue], [1.0, endValue]];
-    this.duration = duration;
-    this.interpolationFunction = interpolationFunction;
-    this.setFunction = setFunction;
-}
-
-/**************************************************************************************************************/
-
-Utils.inherits(Animation, InterpolatedAnimation);
-
-/**************************************************************************************************************/
-
-/*
-	Adds a new value to the animation
-	't' is the value [0, 1] at which the animation value must reach 'value'
-*/
-InterpolatedAnimation.prototype.addValue = function(t, value)
-{
-    var count = this.values.length;
-    var upper = 0;
-    while (upper < count && this.values[upper][0] < t) upper++;
-    // Insert new value at position 'upper'
-    this.values.splice(upper, 0, [t, value]);
-}
-
-/**************************************************************************************************************/
-
-InterpolatedAnimation.prototype.start = function()
-{
-    Animation.prototype.start.call(this);
-    this.setFunction(this.startValue);
-}
-
-/**************************************************************************************************************/
-
-InterpolatedAnimation.prototype.stop = function()
-{
-    Animation.prototype.stop.call(this);
-    this.setFunction(this.endValue);
-}
-
-/**************************************************************************************************************/
-
-/*
-	Animation update method
-*/
-InterpolatedAnimation.prototype.update = function(now)
-{
-    var t = Numeric.map01(now, this.startTime, this.startTime + this.duration);
-    if (t >= 1)
-    {
-        this.stop();
-        return;
+        this.values = [[0.0, startValue], [1.0, endValue]];
+        this.duration = duration;
+        this.interpolationFunction = interpolationFunction;
+        this.setFunction = setFunction;
     }
 
-    // Find upper and lower bounds
-    var count = this.values.length;
-    var upper = 0;
-    while (upper < count && this.values[upper][0] < t) upper++;
-    upper = Math.min(upper, count-1);
-    var lower = Math.max(0, upper-1);
+    /**************************************************************************************************************/
 
-    // Remap t between lower and upper bounds
-    t = Numeric.map01(t, this.values[lower][0], this.values[upper][0]);
-	// Interpolate value
-    var value = this.interpolationFunction(t, this.values[lower][1], this.values[upper][1]);
-	// Use interpolated value
-    this.setFunction(value);
-}
+    Utils.inherits(Animation, InterpolatedAnimation);
 
-/**************************************************************************************************************/
+    /**************************************************************************************************************/
 
-return InterpolatedAnimation;
+    /*
+     Adds a new value to the animation
+     't' is the value [0, 1] at which the animation value must reach 'value'
+     */
+    InterpolatedAnimation.prototype.addValue = function (t, value) {
+        var count = this.values.length;
+        var upper = 0;
+        while (upper < count && this.values[upper][0] < t) upper++;
+        // Insert new value at position 'upper'
+        this.values.splice(upper, 0, [t, value]);
+    }
+
+    /**************************************************************************************************************/
+
+    InterpolatedAnimation.prototype.start = function () {
+        Animation.prototype.start.call(this);
+        this.setFunction(this.startValue);
+    }
+
+    /**************************************************************************************************************/
+
+    InterpolatedAnimation.prototype.stop = function () {
+        Animation.prototype.stop.call(this);
+        this.setFunction(this.endValue);
+    }
+
+    /**************************************************************************************************************/
+
+    /*
+     Animation update method
+     */
+    InterpolatedAnimation.prototype.update = function (now) {
+        var t = Numeric.map01(now, this.startTime, this.startTime + this.duration);
+        if (t >= 1) {
+            this.stop();
+            return;
+        }
+
+        // Find upper and lower bounds
+        var count = this.values.length;
+        var upper = 0;
+        while (upper < count && this.values[upper][0] < t) upper++;
+        upper = Math.min(upper, count - 1);
+        var lower = Math.max(0, upper - 1);
+
+        // Remap t between lower and upper bounds
+        t = Numeric.map01(t, this.values[lower][0], this.values[upper][0]);
+        // Interpolate value
+        var value = this.interpolationFunction(t, this.values[lower][1], this.values[upper][1]);
+        // Use interpolated value
+        this.setFunction(value);
+    }
+
+    /**************************************************************************************************************/
+
+    return InterpolatedAnimation;
 
 });

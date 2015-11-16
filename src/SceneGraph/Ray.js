@@ -17,69 +17,57 @@
  * along with GlobWeb. If not, see <http://www.gnu.org/licenses/>.
  ***************************************/
 
- define( ['../Ray'], function(Ray) {
- 
-Ray.prototype.nodeIntersect = function( node, intersects )
-{
-	var intersects = intersects || [];
-	
-	for ( var i = 0; i < node.children.length; i++ ) 
-	{
-		 node.children[i].intersectWith( this, intersects );
-	}
-	
-	for ( var i = 0; i < node.geometries.length; i++ ) 
-	{
-		this.geometryIntersect( node.geometries[i], intersects );
-	}
-	
-	intersects.sort( function(a,b) {
-		return a.t - b.t;
-	});
-	return intersects;
-};
+define(['../Renderer/Ray'], function (Ray) {
 
-Ray.prototype.lodNodeIntersect = function( node, intersects )
-{
-	var intersects = intersects || [];
-	
-	if ( this.sphereIntersect( node.center, node.radius ) >= 0 )
-	{	
-		if ( node.children.length > 0 && node.childToLoad == 0 )
-		{
-			for ( var i = 0; i < node.children.length; i++ ) 
-			{
-				this.lodNodeIntersect( node.children[i], intersects );
-			}
-		}
-		else
-		{
-			for ( var i = 0; i < node.geometries.length; i++ ) 
-			{
-				this.geometryIntersect( node.geometries[i], intersects );
-			}
-		}
-	}
-		
-	return intersects;
-};
+    Ray.prototype.nodeIntersect = function (node, intersects) {
+        var intersects = intersects || [];
 
-Ray.prototype.geometryIntersect = function( geometry, intersects )
-{
-	var indices = geometry.mesh.indices;
-	for ( var i = 0; i < indices.length; i += 3 ) 
-	{
-		var intersect = this.triangleIntersectOptimized( geometry.mesh.vertices, geometry.mesh.numElements * indices[i], 
-					geometry.mesh.numElements * indices[i+1], geometry.mesh.numElements * indices[i+2] );
-		
-		if (intersect)
-		{
-			intersect.geometry = geometry;
-			intersects.push(intersect);
-		}
-	}
-};
+        for (var i = 0; i < node.children.length; i++) {
+            node.children[i].intersectWith(this, intersects);
+        }
 
-return Ray;
+        for (var i = 0; i < node.geometries.length; i++) {
+            this.geometryIntersect(node.geometries[i], intersects);
+        }
+
+        intersects.sort(function (a, b) {
+            return a.t - b.t;
+        });
+        return intersects;
+    };
+
+    Ray.prototype.lodNodeIntersect = function (node, intersects) {
+        var intersects = intersects || [];
+
+        if (this.sphereIntersect(node.center, node.radius) >= 0) {
+            if (node.children.length > 0 && node.childToLoad == 0) {
+                for (var i = 0; i < node.children.length; i++) {
+                    this.lodNodeIntersect(node.children[i], intersects);
+                }
+            }
+            else {
+                for (var i = 0; i < node.geometries.length; i++) {
+                    this.geometryIntersect(node.geometries[i], intersects);
+                }
+            }
+        }
+
+        return intersects;
+    };
+
+    Ray.prototype.geometryIntersect = function (geometry, intersects) {
+        var indices = geometry.mesh.indices;
+        for (var i = 0; i < indices.length; i += 3) {
+            var intersect = this.triangleIntersectOptimized(geometry.mesh.vertices, geometry.mesh.numElements * indices[i],
+                geometry.mesh.numElements * indices[i + 1], geometry.mesh.numElements * indices[i + 2]);
+
+            if (intersect) {
+                intersect.geometry = geometry;
+                intersects.push(intersect);
+            }
+        }
+    };
+
+    return Ray;
 
 });

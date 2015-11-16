@@ -17,7 +17,7 @@
  * along with GlobWeb. If not, see <http://www.gnu.org/licenses/>.
  ***************************************/
 
-define(['./Utils','./FeatureStyle','./VectorRendererManager','./TiledVectorRenderable','./TiledVectorRenderer','./Numeric','./Triangulator','./PolygonCutter'],
+define(['../Utils/Utils','./FeatureStyle','./VectorRendererManager','../Tiling/TiledVectorRenderable','../Tiling/TiledVectorRenderer','../Utils/Numeric','./Tiling/Triangulator','./PolygonCutter'],
 	function(Utils,FeatureStyle,VectorRendererManager,TiledVectorRenderable,TiledVectorRenderer,Numeric,Triangulator,PolygonCutter) {
 
 /**************************************************************************************************************/

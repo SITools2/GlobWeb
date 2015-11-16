@@ -18,7 +18,7 @@
  * along with GlobWeb. If not, see <http://www.gnu.org/licenses/>.
  ***************************************/
 
-define(["./Numeric"], function(Numeric) {
+define(["../Utils/Numeric"], function(Numeric) {
 
 /**************************************************************************************************************/
 var transferFonctions = {

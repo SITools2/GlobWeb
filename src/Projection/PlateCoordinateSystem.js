@@ -17,52 +17,55 @@
  * along with GlobWeb. If not, see <http://www.gnu.org/licenses/>.
  ***************************************/
 
-define( ['./CoordinateSystem', './Utils', './glMatrix'],
-	function(CoordinateSystem, Utils) {
+define(['../CoordinateSystem/CoordinateSystem', '../Utils/Utils', '../Renderer/glMatrix'],
+    function (CoordinateSystem, Utils) {
 
-/**************************************************************************************************************/
+        /**************************************************************************************************************/
 
-/**
- *  Plate Carré coordinate system
- */
-var PlateCoordinateSystem = function(options)
-{
-	CoordinateSystem.prototype.constructor.call( this, options );
-    this.isFlat = true;
-};
+        /**
+         *  Plate Carré coordinate system
+         */
+        var PlateCoordinateSystem = function (options) {
+            CoordinateSystem.prototype.constructor.call(this, options);
+            this.isFlat = true;
+        };
 
-/**************************************************************************************************************/
+        /**************************************************************************************************************/
 
-Utils.inherits( CoordinateSystem, PlateCoordinateSystem );
+        Utils.inherits(CoordinateSystem, PlateCoordinateSystem);
 
-/**************************************************************************************************************/
+        /**************************************************************************************************************/
 
-/**
- *	From 3D to Plate Carré
- */
-PlateCoordinateSystem.prototype.from3DToGeo = function(position3d, dest) {
-    if (!dest) { dest = new Array(3); }
-    dest[0] = position3d[0] * 180/Math.PI;
-    dest[1] = position3d[1] * 180/Math.PI;
-    dest[2] = 0.;
-    return dest;
-};
+        /**
+         *    From 3D to Plate Carré
+         */
+        PlateCoordinateSystem.prototype.from3DToGeo = function (position3d, dest) {
+            if (!dest) {
+                dest = new Array(3);
+            }
+            dest[0] = position3d[0] * 180 / Math.PI;
+            dest[1] = position3d[1] * 180 / Math.PI;
+            dest[2] = 0.;
+            return dest;
+        };
 
-/**************************************************************************************************************/
+        /**************************************************************************************************************/
 
-/**
- *  From Plate Carré to 3D
- */
-PlateCoordinateSystem.prototype.fromGeoTo3D = function(geoPos, dest) {
-	if (!dest) { dest = new Array(3); }
-    dest[0] = geoPos[0] * Math.PI/180;
-    dest[1] = geoPos[1] * Math.PI/180;
-    dest[2] = 0.;
-    return dest;
-};
+        /**
+         *  From Plate Carré to 3D
+         */
+        PlateCoordinateSystem.prototype.fromGeoTo3D = function (geoPos, dest) {
+            if (!dest) {
+                dest = new Array(3);
+            }
+            dest[0] = geoPos[0] * Math.PI / 180;
+            dest[1] = geoPos[1] * Math.PI / 180;
+            dest[2] = 0.;
+            return dest;
+        };
 
-/**************************************************************************************************************/
+        /**************************************************************************************************************/
 
-return PlateCoordinateSystem;
+        return PlateCoordinateSystem;
 
-});
+    });

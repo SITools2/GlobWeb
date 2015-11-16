@@ -17,97 +17,86 @@
  * along with GlobWeb. If not, see <http://www.gnu.org/licenses/>.
  ***************************************/
 
- define( function() {
+define(function () {
 
-/**************************************************************************************************************/
+    /**************************************************************************************************************/
 
-/** 
- * 	@class Manage the attributions
-	@constructor
-	Function constructor for AttributionHandler
-	
-	@param globe
-	@param options Configuration properties
-		<ul>
-			<li>element : the HTML element to show attributions, can be a string (the ID) or the DOM element itself</li>
-		</ul>
-*/
+    /**
+     *    @class Manage the attributions
+     @constructor
+     Function constructor for AttributionHandler
 
-var AttributionHandler = function(globe, options)
-{
-	globe.attributionHandler = this;
+     @param globe
+     @param options Configuration properties
+     <ul>
+     <li>element : the HTML element to show attributions, can be a string (the ID) or the DOM element itself</li>
+     </ul>
+     */
 
-	var elt = options ? options['element'] : undefined;
-	if ( elt )
-	{	
-		if (typeof elt == "string") 
-		{
-			this.element = document.getElementById(elt);
-		}
-		else
-		{
-			this.element = elt;
-		}
-	}
-}
+    var AttributionHandler = function (globe, options) {
+        globe.attributionHandler = this;
 
-/**************************************************************************************************************/
+        var elt = options ? options['element'] : undefined;
+        if (elt) {
+            if (typeof elt == "string") {
+                this.element = document.getElementById(elt);
+            }
+            else {
+                this.element = elt;
+            }
+        }
+    }
 
-/**
-* 	Remove attribution from HTML
-* 	@param layer Selected layer
-*/
-AttributionHandler.prototype.removeAttribution = function( layer )
-{
-	var div = document.getElementById( this.element.id+"_"+layer.id );
-	if ( div )
-		this.element.removeChild( div );
-}
+    /**************************************************************************************************************/
 
-/**************************************************************************************************************/
+    /**
+     *    Remove attribution from HTML
+     *    @param layer Selected layer
+     */
+    AttributionHandler.prototype.removeAttribution = function (layer) {
+        var div = document.getElementById(this.element.id + "_" + layer.id);
+        if (div)
+            this.element.removeChild(div);
+    }
 
-/**
-* 	Add attribution in HTML
-* 	@param layer Selected layer
-*/
-AttributionHandler.prototype.addAttribution = function(layer)
-{ 
-	var div = document.createElement('div');
-	div.innerHTML = layer.attribution;
-	div.id = this.element.id + "_" + layer.id;
-	
-	if(layer.id == 0)
-	{
-		// Background layer
-		this.element.insertBefore( div, this.element.firstChild );
-	}
-	else
-	{
-		this.element.appendChild( div );
-	}
-}
+    /**************************************************************************************************************/
 
-/**************************************************************************************************************/
+    /**
+     *    Add attribution in HTML
+     *    @param layer Selected layer
+     */
+    AttributionHandler.prototype.addAttribution = function (layer) {
+        var div = document.createElement('div');
+        div.innerHTML = layer.attribution;
+        div.id = this.element.id + "_" + layer.id;
 
-/**
-*	Toggle attribution
-* 	@param layer Selected layer
-*/
-AttributionHandler.prototype.toggleAttribution = function(layer)
-{
-	var div = document.getElementById(this.element.id+"_"+layer.id);
-	if ( div )
-	{
-		this.removeAttribution(layer);
-	}
-	else
-	{
-		this.addAttribution(layer);
-	}
-}
+        if (layer.id == 0) {
+            // Background layer
+            this.element.insertBefore(div, this.element.firstChild);
+        }
+        else {
+            this.element.appendChild(div);
+        }
+    }
 
-/**************************************************************************************************************/
+    /**************************************************************************************************************/
 
-return AttributionHandler;
+    /**
+     *    Toggle attribution
+     *    @param layer Selected layer
+     */
+    AttributionHandler.prototype.toggleAttribution = function (layer) {
+        var div = document.getElementById(this.element.id + "_" + layer.id);
+        if (div) {
+            this.removeAttribution(layer);
+        }
+        else {
+            this.addAttribution(layer);
+        }
+    }
+
+    /**************************************************************************************************************/
+
+    return AttributionHandler;
 
 });

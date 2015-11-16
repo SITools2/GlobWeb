@@ -17,109 +17,102 @@
  * along with GlobWeb. If not, see <http://www.gnu.org/licenses/>.
  ***************************************/
 
- define(['./Globe', './EquatorialCoordinateSystem', './TileManager', './TilePool', './Utils' ], 
-	function(Globe, EquatorialCoordinateSystem, TileManager, TilePool, Utils) {
+define(['../Context/Globe', '../CoordinateSystem/EquatorialCoordinateSystem', '../Tiling/TileManager', '../Tiling/TilePool', '../Utils/Utils'],
+    function (Globe, EquatorialCoordinateSystem, TileManager, TilePool, Utils) {
 
-/**************************************************************************************************************/
+        /**************************************************************************************************************/
 
-/** 
-	@name Sky
-	@class
-	Create a virtual sky in a HTML canvas element, passed in options parameter.
-	The virtual sky data is set using setBaseImage/addLayer methods.
-	
-	@param options Configuration properties for the Sky :
-		<ul>
-			<li>canvas : the canvas for WebGL, can be string (id) or a canvas element</li>
-			<li>renderContext : <RenderContext> object to use the existing render context</li>
-			<li>backgroundColor : the background color of the canvas (an array of 4 floats)</li>
-			<li>shadersPath : the path to shaders file</li>
-			<li>continuousRendering: if true rendering is done continuously, otherwise it is done only if needed</li>
-		</ul>
-	
- */
-var Sky = function(options)
-{
-	options.coordinateSystem = new EquatorialCoordinateSystem(options);
-	Globe.prototype.constructor.call( this, options );
+        /**
+         @name Sky
+         @class
+             Create a virtual sky in a HTML canvas element, passed in options parameter.
+         The virtual sky data is set using setBaseImage/addLayer methods.
 
-	this.isSky = true;
-	this.tilePool =  new TilePool(this.renderContext);
-	this.tileManagers = {
-		'EQ': this.tileManager,
-		'GAL': new TileManager( this, options )
-	};
+         @param options Configuration properties for the Sky :
+         <ul>
+         <li>canvas : the canvas for WebGL, can be string (id) or a canvas element</li>
+         <li>renderContext : <RenderContext> object to use the existing render context</li>
+         <li>backgroundColor : the background color of the canvas (an array of 4 floats)</li>
+         <li>shadersPath : the path to shaders file</li>
+         <li>continuousRendering: if true rendering is done continuously, otherwise it is done only if needed</li>
+         </ul>
 
-	this.renderContext.requestFrame();
-}
+         */
+        var Sky = function (options) {
+            options.coordinateSystem = new EquatorialCoordinateSystem(options);
+            Globe.prototype.constructor.call(this, options);
 
-/**************************************************************************************************************/
+            this.isSky = true;
+            this.tilePool = new TilePool(this.renderContext);
+            this.tileManagers = {
+                'EQ': this.tileManager,
+                'GAL': new TileManager(this, options)
+            };
 
-Utils.inherits( Globe, Sky );
+            this.renderContext.requestFrame();
+        }
 
-/**************************************************************************************************************/
+        /**************************************************************************************************************/
 
-/** 
-	Dispose the sky and all its ressources
- */
-Sky.prototype.dispose = function()
-{	
-	for ( var x in this.tileManagers )
-	{
-		this.tileManagers[x].tilePool.disposeAll();	
-		this.tileManagers[x].reset();
-	}
-}
+        Utils.inherits(Globe, Sky);
 
-/**************************************************************************************************************/
+        /**************************************************************************************************************/
 
-/** 
-  Set the base imagery layer for the sky
-  
-  @param {RasterLayer} layer the layer to use, must be an imagery RasterLayer
-*/
-Sky.prototype.setBaseImagery = function(layer)
-{
-	if ( this.baseImagery == layer )
-		return;
-		
-	if ( this.baseImagery ) 
-	{
-		this.removeLayer( this.baseImagery );	
-		this.tileManagers[ this.baseImagery.coordSystem ].setImageryProvider(null);
-		this.baseImagery = null;		
-	}
-	
-	// Attach the layer to the globe 
-	if ( layer )
-	{
-		layer._overlay = false;
-		this.addLayer(layer);
-		
-		// Modify the tile manager after the layer has been attached
-		//this.tileManager = this.tileManagers[layer.coordSystem];
-		this.tileManagers[ layer.coordSystem ].setImageryProvider( layer );
-		this.baseImagery = layer;
-	}
-	
-}
+        /**
+         Dispose the sky and all its ressources
+         */
+        Sky.prototype.dispose = function () {
+            for (var x in this.tileManagers) {
+                this.tileManagers[x].tilePool.disposeAll();
+                this.tileManagers[x].reset();
+            }
+        }
 
-/**************************************************************************************************************/
+        /**************************************************************************************************************/
 
-/**
-	Render the globe
-	TODO : private for now because it is automatically called in requestAnimationFrame.
-	@private
- */
-Sky.prototype.render = function()
-{		
-	// Render tiles manager
-	this.tileManagers['GAL'].render();
-	this.tileManagers['EQ'].render();
-}
+        /**
+         Set the base imagery layer for the sky
 
-/**************************************************************************************************************/
+         @param {RasterLayer} layer the layer to use, must be an imagery RasterLayer
+         */
+        Sky.prototype.setBaseImagery = function (layer) {
+            if (this.baseImagery == layer)
+                return;
 
-return Sky;
+            if (this.baseImagery) {
+                this.removeLayer(this.baseImagery);
+                this.tileManagers[this.baseImagery.coordSystem].setImageryProvider(null);
+                this.baseImagery = null;
+            }
 
-});
+            // Attach the layer to the globe
+            if (layer) {
+                layer._overlay = false;
+                this.addLayer(layer);
+
+                // Modify the tile manager after the layer has been attached
+                //this.tileManager = this.tileManagers[layer.coordSystem];
+                this.tileManagers[layer.coordSystem].setImageryProvider(layer);
+                this.baseImagery = layer;
+            }
+
+        }
+
+        /**************************************************************************************************************/
+
+        /**
+         Render the globe
+         TODO : private for now because it is automatically called in requestAnimationFrame.
+         @private
+         */
+        Sky.prototype.render = function () {
+            // Render tiles manager
+            this.tileManagers['GAL'].render();
+            this.tileManagers['EQ'].render();
+        }
+
+        /**************************************************************************************************************/
+
+        return Sky;
+
+    });

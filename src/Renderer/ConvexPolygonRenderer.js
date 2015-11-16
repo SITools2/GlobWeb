@@ -17,7 +17,7 @@
  * along with GlobWeb. If not, see <http://www.gnu.org/licenses/>.
  ***************************************/
 
-define(['./Utils','./VectorRenderer','./Program','./FeatureStyle', './VectorRendererManager', './Triangulator', './glMatrix'],
+define(['../Utils/Utils','./VectorRenderer','./Program','./FeatureStyle', './VectorRendererManager', '../Tiling/Triangulator', './glMatrix'],
 	function(Utils,VectorRenderer,Program,FeatureStyle,VectorRendererManager, Triangulator) {
 
 /**************************************************************************************************************/

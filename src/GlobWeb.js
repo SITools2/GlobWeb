@@ -16,48 +16,48 @@
  * You should have received a copy of the GNU General Public License
  * along with GlobWeb. If not, see <http://www.gnu.org/licenses/>.
  ***************************************/
- 
-define( ["./Globe", "./GeoBound",
-		"./WMSLayer", "./WMTSLayer", "./WCSElevationLayer", "./OSMLayer", "./BingLayer", "./VectorLayer", "./AtmosphereLayer", "./GroundOverlayLayer", "./TileWireframeLayer", // Layers
-		"./AitoffCoordinateSystem", "./MercatorCoordinateSystem", "./PlateCoordinateSystem", "./AugustCoordinateSystem", "./MollweideCoordinateSystem", // CoordinateSystems
-		"./Navigation", "./FlatNavigation", "./FeatureStyle", "./Stats", "./KMLParser", "./PathAnimation", "./Numeric", "./SegmentedAnimation", // Others
-		"./PointRenderer", "./LineStringRenderable", "./PolygonRenderer", "./LineRenderer" ], // Renderers
-	function(Globe, GeoBound, WMSLayer, WMTSLayer, WCSElevationLayer, OSMLayer, BingLayer, VectorLayer, AtmosphereLayer, GroundOverlayLayer, TileWireframeLayer,
-			AitoffCoordinateSystem, MercatorCoordinateSystem, PlateCoordinateSystem, AugustCoordinateSystem, MollweideCoordinateSystem,
-		 	Navigation, FlatNavigation, FeatureStyle, Stats, KMLParser, PathAnimation, Numeric, SegmentedAnimation,
-		  	PointRenderer) {
+
+define(["./Context/Globe", "./Renderer/GeoBound",
+        "./Layer/WMSLayer", "./Layer/WMTSLayer", "./Layer/WCSElevationLayer", "./Layer/OSMLayer", "./Layer/BingLayer", "./Layer/VectorLayer", "./Layer/AtmosphereLayer", "./Layer/GroundOverlayLayer", "./Layer/TileWireframeLayer", // Layers
+        "./Projection/AitoffCoordinateSystem", "./Projection/MercatorCoordinateSystem", "./Projection/PlateCoordinateSystem", "./Projection/AugustCoordinateSystem", "./Projection/MollweideCoordinateSystem", // CoordinateSystems
+        "./Navigation/Navigation", "./Navigation/FlatNavigation", "./Renderer/FeatureStyle", "./Utils/Stats", "./Parser/KMLParser", "./Animation/PathAnimation", "./Utils/Numeric", "./Animation/SegmentedAnimation", // Others
+        "./Renderer/PointRenderer", "./Renderer/LineStringRenderable", "./Renderer/PolygonRenderer", "./Renderer/LineRenderer"], // Renderers
+    function (Globe, GeoBound, WMSLayer, WMTSLayer, WCSElevationLayer, OSMLayer, BingLayer, VectorLayer, AtmosphereLayer, GroundOverlayLayer, TileWireframeLayer,
+              AitoffCoordinateSystem, MercatorCoordinateSystem, PlateCoordinateSystem, AugustCoordinateSystem, MollweideCoordinateSystem,
+              Navigation, FlatNavigation, FeatureStyle, Stats, KMLParser, PathAnimation, Numeric, SegmentedAnimation,
+              PointRenderer) {
 
 // Declare GlobWeb 
-var GlobWeb = {};
+        var GlobWeb = {};
 
-GlobWeb.Globe = Globe;
-GlobWeb.GeoBound = GeoBound;
-GlobWeb.WMSLayer = WMSLayer;
-GlobWeb.WMTSLayer = WMTSLayer;
-GlobWeb.WCSElevationLayer = WCSElevationLayer;
-GlobWeb.OSMLayer = OSMLayer;
-GlobWeb.BingLayer = BingLayer;
-GlobWeb.VectorLayer = VectorLayer;
-GlobWeb.TileWireframeLayer = TileWireframeLayer;
-GlobWeb.FeatureStyle = FeatureStyle;
-GlobWeb.AtmosphereLayer = AtmosphereLayer;
-GlobWeb.GroundOverlayLayer = GroundOverlayLayer;
-GlobWeb.Navigation = Navigation;
-GlobWeb.FlatNavigation = FlatNavigation;
-GlobWeb.Stats = Stats;
-GlobWeb.KMLParser = KMLParser;
-GlobWeb.Numeric = Numeric;
-GlobWeb.PathAnimation = PathAnimation;
-GlobWeb.SegmentedAnimation = SegmentedAnimation;
+        GlobWeb.Globe = Globe;
+        GlobWeb.GeoBound = GeoBound;
+        GlobWeb.WMSLayer = WMSLayer;
+        GlobWeb.WMTSLayer = WMTSLayer;
+        GlobWeb.WCSElevationLayer = WCSElevationLayer;
+        GlobWeb.OSMLayer = OSMLayer;
+        GlobWeb.BingLayer = BingLayer;
+        GlobWeb.VectorLayer = VectorLayer;
+        GlobWeb.TileWireframeLayer = TileWireframeLayer;
+        GlobWeb.FeatureStyle = FeatureStyle;
+        GlobWeb.AtmosphereLayer = AtmosphereLayer;
+        GlobWeb.GroundOverlayLayer = GroundOverlayLayer;
+        GlobWeb.Navigation = Navigation;
+        GlobWeb.FlatNavigation = FlatNavigation;
+        GlobWeb.Stats = Stats;
+        GlobWeb.KMLParser = KMLParser;
+        GlobWeb.Numeric = Numeric;
+        GlobWeb.PathAnimation = PathAnimation;
+        GlobWeb.SegmentedAnimation = SegmentedAnimation;
 
-GlobWeb.MercatorCoordinateSystem = MercatorCoordinateSystem
-GlobWeb.PlateCoordinateSystem = PlateCoordinateSystem
-GlobWeb.AugustCoordinateSystem = AugustCoordinateSystem;
-GlobWeb.MollweideCoordinateSystem = MollweideCoordinateSystem;
-GlobWeb.AitoffCoordinateSystem = AitoffCoordinateSystem;
+        GlobWeb.MercatorCoordinateSystem = MercatorCoordinateSystem
+        GlobWeb.PlateCoordinateSystem = PlateCoordinateSystem
+        GlobWeb.AugustCoordinateSystem = AugustCoordinateSystem;
+        GlobWeb.MollweideCoordinateSystem = MollweideCoordinateSystem;
+        GlobWeb.AitoffCoordinateSystem = AitoffCoordinateSystem;
 
-window.GlobWeb = GlobWeb;
+        window.GlobWeb = GlobWeb;
 
-return GlobWeb;
+        return GlobWeb;
 
-});
+    });

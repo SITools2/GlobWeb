@@ -17,27 +17,27 @@
  * along with GlobWeb. If not, see <http://www.gnu.org/licenses/>.
  ***************************************/
 
- // Declare the AstroWeb namespace
- define( ["./Globe",
-		"./VectorLayer", "./HEALPixLayer", "./OpenSearchLayer", "./TileWireframeLayer", // Layers
-		"./AstroNavigation", "./FeatureStyle", "./Stats", // Others
-		"./PointSpriteRenderer", "./ConvexPolygonRenderer"], // Renderers
-	function(Globe, VectorLayer, HEALPixLayer, OpenSearchLayer, TileWireframeLayer, AstroNavigation, FeatureStyle, Stats) {
+    // Declare the AstroWeb namespace
+define(["./Context/Globe",
+        "./Layer/VectorLayer", "./Layer/HEALPixLayer", "./Layer/OpenSearchLayer", "./Layer/TileWireframeLayer", // Layers
+        "./Navigation/AstroNavigation", "./Renderer/FeatureStyle", "./Utils/Stats", // Others
+        "./Renderer/PointSpriteRenderer", "./Renderer/ConvexPolygonRenderer"], // Renderers
+    function (Globe, VectorLayer, HEALPixLayer, OpenSearchLayer, TileWireframeLayer, AstroNavigation, FeatureStyle, Stats) {
 
 // Declare AstroWeb 
-var AstroWeb = {};
+        var AstroWeb = {};
 
-AstroWeb.Globe = Globe;
-AstroWeb.VectorLayer = VectorLayer;
-AstroWeb.HEALPixLayer = HEALPixLayer;
-AstroWeb.OpenSearchLayer = OpenSearchLayer;
-AstroWeb.TileWireframeLayer = TileWireframeLayer;
-AstroWeb.AstroNavigation = AstroNavigation;
-AstroWeb.FeatureStyle = FeatureStyle;
-AstroWeb.Stats = Stats;
+        AstroWeb.Globe = Globe;
+        AstroWeb.VectorLayer = VectorLayer;
+        AstroWeb.HEALPixLayer = HEALPixLayer;
+        AstroWeb.OpenSearchLayer = OpenSearchLayer;
+        AstroWeb.TileWireframeLayer = TileWireframeLayer;
+        AstroWeb.AstroNavigation = AstroNavigation;
+        AstroWeb.FeatureStyle = FeatureStyle;
+        AstroWeb.Stats = Stats;
 
-window.AstroWeb = AstroWeb;
+        window.AstroWeb = AstroWeb;
 
-return AstroWeb;
+        return AstroWeb;
 
-});
+    });

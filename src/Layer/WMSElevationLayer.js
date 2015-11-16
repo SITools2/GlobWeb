@@ -17,49 +17,45 @@
  * along with GlobWeb. If not, see <http://www.gnu.org/licenses/>.
  ***************************************/
 
-define(['./Utils', './WMSLayer'], 
-	function(Utils, WMSLayer) {
+define(['../Utils/Utils', './WMSLayer'],
+    function (Utils, WMSLayer) {
 
-/**************************************************************************************************************/
+        /**************************************************************************************************************/
 
-/** @export
-	@constructor
-	WMSElevationLayer constructor
- */
-var WMSElevationLayer = function( options )
-{
-	options['format'] = 'image/x-aaigrid';
-	options['tilePixelSize'] = options['tilePixelSize'] || 33;
-	WMSLayer.prototype.constructor.call( this, options );
-}
+        /** @export
+         @constructor
+         WMSElevationLayer constructor
+         */
+        var WMSElevationLayer = function (options) {
+            options['format'] = 'image/x-aaigrid';
+            options['tilePixelSize'] = options['tilePixelSize'] || 33;
+            WMSLayer.prototype.constructor.call(this, options);
+        }
 
-Utils.inherits(WMSLayer,WMSElevationLayer);
+        Utils.inherits(WMSLayer, WMSElevationLayer);
 
 
-/**************************************************************************************************************/
+        /**************************************************************************************************************/
 
-/**
-	Parse a elevation response
- */
-WMSElevationLayer.prototype.parseElevations = function(text)
-{
-	var elevations = [];
-	var lines = text.trim().split('\n');
-	
-	for ( var i = 5; i < lines.length; i++ )
-	{
-		var elts = lines[i].trim().split(/\s+/);
-		for ( var n=0; n < elts.length; n++ )
-		{
-			elevations.push( parseInt(elts[n]) );
-		}
-	}
-	
-	return elevations;
-}
+        /**
+         Parse a elevation response
+         */
+        WMSElevationLayer.prototype.parseElevations = function (text) {
+            var elevations = [];
+            var lines = text.trim().split('\n');
 
-/**************************************************************************************************************/
+            for (var i = 5; i < lines.length; i++) {
+                var elts = lines[i].trim().split(/\s+/);
+                for (var n = 0; n < elts.length; n++) {
+                    elevations.push(parseInt(elts[n]));
+                }
+            }
 
-return WMSElevationLayer;
+            return elevations;
+        }
 
-});
+        /**************************************************************************************************************/
+
+        return WMSElevationLayer;
+
+    });

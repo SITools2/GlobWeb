@@ -17,7 +17,7 @@
  * along with GlobWeb. If not, see <http://www.gnu.org/licenses/>.
  ***************************************/
 
-define(['./RendererTileData','./Tile'],
+define(['./RendererTileData','../Tiling/Tile'],
 	function(RendererTileData, Tile) {
 
 /**************************************************************************************************************/

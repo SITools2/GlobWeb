@@ -17,7 +17,7 @@
  * along with GlobWeb. If not, see <http://www.gnu.org/licenses/>.
  ***************************************/
  
-define( ['./Utils', './Numeric', './VectorRenderer','./VectorRendererManager','./Program','./BatchRenderable'], 
+define( ['../Utils/Utils', '../Utils/Numeric', './VectorRenderer','./VectorRendererManager','./Program','./BatchRenderable'],
 	function(Utils,Numeric,VectorRenderer,VectorRendererManager,Program,BatchRenderable) {
 
 /**************************************************************************************************************/

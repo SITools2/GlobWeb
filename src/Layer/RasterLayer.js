@@ -17,99 +17,91 @@
  * along with GlobWeb. If not, see <http://www.gnu.org/licenses/>.
  ***************************************/
 
- define(['./Utils', './BaseLayer', './RasterOverlayRenderer', './Cache' ], 
-	function(Utils, BaseLayer, RasterOverlayRenderer, Cache) {
+define(['../Utils/Utils', './BaseLayer', '../Renderer/RasterOverlayRenderer', '../Utils/Cache'],
+    function (Utils, BaseLayer, RasterOverlayRenderer, Cache) {
 
-/**************************************************************************************************************/
+        /**************************************************************************************************************/
 
 
-/** @name RasterLayer
-	@class
-	Base class for raster layer
-	@augments BaseLayer
-	@param options Configuration properties for the RasterLayer. See {@link BaseLayer} for base properties :
-		<ul>
-			<li>tilePixelSize : the image size for a tile, default is 256.</li>
-			<li>numberOfLevels : the maximum number of levels</li> 
-			<li>geoBound : the extent of the layer</li>
-			<li>cache : Object containing cache options</li>
-		</ul>
-*/
-var RasterLayer = function( options )
-{
-	BaseLayer.prototype.constructor.call( this, options );
-	
-	// Base properties
-	this.tilePixelSize = -1;
-	this.tiling = null;
-	this.numberOfLevels = -1;
-	this.geoBound = options.geoBound || null;
-	this.coordinates = options.coordinates || null;
-	this.zIndex = options.zIndex || 0;
-	this.crossOrigin = options.crossOrigin || 'anonymous';
+        /** @name RasterLayer
+         @class
+             Base class for raster layer
+         @augments BaseLayer
+         @param options Configuration properties for the RasterLayer. See {@link BaseLayer} for base properties :
+         <ul>
+         <li>tilePixelSize : the image size for a tile, default is 256.</li>
+         <li>numberOfLevels : the maximum number of levels</li>
+         <li>geoBound : the extent of the layer</li>
+         <li>cache : Object containing cache options</li>
+         </ul>
+         */
+        var RasterLayer = function (options) {
+            BaseLayer.prototype.constructor.call(this, options);
 
-	// Init cache if defined
-	if ( options.cache )
-	{
-		options.cache.layer = this;
-		this.cache = new Cache(options.cache);
-	}
-	
-	// Internal
-	this._overlay = true; 
-	this._ready = true; // Ready is use by TileManager
-}
+            // Base properties
+            this.tilePixelSize = -1;
+            this.tiling = null;
+            this.numberOfLevels = -1;
+            this.geoBound = options.geoBound || null;
+            this.coordinates = options.coordinates || null;
+            this.zIndex = options.zIndex || 0;
+            this.crossOrigin = options.crossOrigin || 'anonymous';
 
-/**************************************************************************************************************/
+            // Init cache if defined
+            if (options.cache) {
+                options.cache.layer = this;
+                this.cache = new Cache(options.cache);
+            }
 
-Utils.inherits( BaseLayer,RasterLayer );
+            // Internal
+            this._overlay = true;
+            this._ready = true; // Ready is use by TileManager
+        }
 
-/**************************************************************************************************************/
+        /**************************************************************************************************************/
 
-/** 
-  Attach the raster layer to the globe
- */
-RasterLayer.prototype._attach = function( g )
-{
-	if ( !this._overlay )
-	{
-		// Override id of background layer because of unicity of background not overlayed layer
-		this.id = 0;
-	}
+        Utils.inherits(BaseLayer, RasterLayer);
 
-	BaseLayer.prototype._attach.call( this, g );
-		
-	if ( this._overlay )
-	{
-		// Create the renderer if needed
-		if ( !g.rasterOverlayRenderer )
-		{
-			var renderer = new RasterOverlayRenderer(g);
-			g.vectorRendererManager.renderers.push( renderer );
-			g.rasterOverlayRenderer = renderer;
-		}
-		g.rasterOverlayRenderer.addOverlay(this);
-	}
-}
+        /**************************************************************************************************************/
 
-/**************************************************************************************************************/
+        /**
+         Attach the raster layer to the globe
+         */
+        RasterLayer.prototype._attach = function (g) {
+            if (!this._overlay) {
+                // Override id of background layer because of unicity of background not overlayed layer
+                this.id = 0;
+            }
 
-/** 
-  Detach the raster layer from the globe
- */
-RasterLayer.prototype._detach = function()
-{
-	// Remove raster from overlay renderer if needed
-	if ( this._overlay && this.globe.rasterOverlayRenderer )
-	{
-		this.globe.rasterOverlayRenderer.removeOverlay(this);
-	}
-	
-	BaseLayer.prototype._detach.call(this);
-}
+            BaseLayer.prototype._attach.call(this, g);
 
-/**************************************************************************************************************/
+            if (this._overlay) {
+                // Create the renderer if needed
+                if (!g.rasterOverlayRenderer) {
+                    var renderer = new RasterOverlayRenderer(g);
+                    g.vectorRendererManager.renderers.push(renderer);
+                    g.rasterOverlayRenderer = renderer;
+                }
+                g.rasterOverlayRenderer.addOverlay(this);
+            }
+        }
 
-return RasterLayer;
+        /**************************************************************************************************************/
 
-});
+        /**
+         Detach the raster layer from the globe
+         */
+        RasterLayer.prototype._detach = function () {
+            // Remove raster from overlay renderer if needed
+            if (this._overlay && this.globe.rasterOverlayRenderer) {
+                this.globe.rasterOverlayRenderer.removeOverlay(this);
+            }
+
+            BaseLayer.prototype._detach.call(this);
+        }
+
+        /**************************************************************************************************************/
+
+        return RasterLayer;
+
+    });

@@ -17,91 +17,93 @@
  * along with GlobWeb. If not, see <http://www.gnu.org/licenses/>.
  ***************************************/
 
-define( ['./CoordinateSystem', './Utils', './glMatrix'],
-	function(CoordinateSystem, Utils) {
+define(['../CoordinateSystem/CoordinateSystem', '../Utils/Utils', '../Renderer/glMatrix'],
+    function (CoordinateSystem, Utils) {
 
-/**************************************************************************************************************/
+        /**************************************************************************************************************/
 
-var MollweideCoordinateSystem = function(options)
-{
-	CoordinateSystem.prototype.constructor.call( this, options );
-    this.isFlat = true;
-};
+        var MollweideCoordinateSystem = function (options) {
+            CoordinateSystem.prototype.constructor.call(this, options);
+            this.isFlat = true;
+        };
 
-/**************************************************************************************************************/
+        /**************************************************************************************************************/
 
-Utils.inherits( CoordinateSystem, MollweideCoordinateSystem );
+        Utils.inherits(CoordinateSystem, MollweideCoordinateSystem);
 
-/**************************************************************************************************************/
+        /**************************************************************************************************************/
 
-/**
- *  Newton-Raphson method to find auxiliary theta needed for mollweide x/y computation
- *  @see https://en.wikipedia.org/wiki/Mollweide_projection
- */
-function _findTheta( lat )
-{
-    // Avoid divide by zero
-    if ( Math.abs(lat) == Math.PI/2 )
-        return lat;
+        /**
+         *  Newton-Raphson method to find auxiliary theta needed for mollweide x/y computation
+         *  @see https://en.wikipedia.org/wiki/Mollweide_projection
+         */
+        function _findTheta(lat) {
+            // Avoid divide by zero
+            if (Math.abs(lat) == Math.PI / 2)
+                return lat;
 
-    var epsilon = 0.001;
-    var thetaN = lat;  // n
-    var thetaN1;       // n+1
+            var epsilon = 0.001;
+            var thetaN = lat;  // n
+            var thetaN1;       // n+1
 
-    do
-    {
-        var twoThetaN = 2*thetaN;
-        thetaN = thetaN1;
-        if (!thetaN)
-            thetaN = lat;
-        thetaN1 = twoThetaN/2 - (twoThetaN + Math.sin(twoThetaN) - Math.PI*Math.sin(lat)) / (2 + 2*Math.cos(twoThetaN));
-    } while( Math.abs( thetaN1 - thetaN ) >= epsilon );
+            do
+            {
+                var twoThetaN = 2 * thetaN;
+                thetaN = thetaN1;
+                if (!thetaN)
+                    thetaN = lat;
+                thetaN1 = twoThetaN / 2 - (twoThetaN + Math.sin(twoThetaN) - Math.PI * Math.sin(lat)) / (2 + 2 * Math.cos(twoThetaN));
+            } while (Math.abs(thetaN1 - thetaN) >= epsilon);
 
-    return thetaN1;
-}
+            return thetaN1;
+        }
 
-/**************************************************************************************************************/
+        /**************************************************************************************************************/
 
-/**
- *	From 3D to Mollweide
- */
-MollweideCoordinateSystem.prototype.from3DToGeo = function(position3d, dest) {
-    if (!dest) { dest = new Array(3); }
+        /**
+         *    From 3D to Mollweide
+         */
+        MollweideCoordinateSystem.prototype.from3DToGeo = function (position3d, dest) {
+            if (!dest) {
+                dest = new Array(3);
+            }
 
-    var auxTheta = Math.asin( position3d[1] / Math.sqrt(2) );
-    var phi = Math.asin( (2*auxTheta + Math.sin(2*auxTheta))/Math.PI );
-    var lambda = (Math.PI * position3d[0]) / ( 2 * Math.sqrt(2) * Math.cos(auxTheta));
+            var auxTheta = Math.asin(position3d[1] / Math.sqrt(2));
+            var phi = Math.asin((2 * auxTheta + Math.sin(2 * auxTheta)) / Math.PI);
+            var lambda = (Math.PI * position3d[0]) / ( 2 * Math.sqrt(2) * Math.cos(auxTheta));
 
-    dest[0] = lambda*180/Math.PI;
-    dest[1] = phi*180/Math.PI;
-    dest[2] = 0.;
-    return dest;
-};
+            dest[0] = lambda * 180 / Math.PI;
+            dest[1] = phi * 180 / Math.PI;
+            dest[2] = 0.;
+            return dest;
+        };
 
-/**************************************************************************************************************/
+        /**************************************************************************************************************/
 
-/**
- *  From Mollweide to 3D
- */
-MollweideCoordinateSystem.prototype.fromGeoTo3D = function(geoPos, dest) {
-	if (!dest) { dest = new Array(3); }
+        /**
+         *  From Mollweide to 3D
+         */
+        MollweideCoordinateSystem.prototype.fromGeoTo3D = function (geoPos, dest) {
+            if (!dest) {
+                dest = new Array(3);
+            }
 
-	var lambda = geoPos[0] * Math.PI/180 ; // longitude
-    var theta0 = geoPos[1] * Math.PI/180;  // latitude
-    var auxTheta = _findTheta( theta0 );
-    
-    // Transfrom to Mollweide coordinate system
-    var mollX = 2*Math.sqrt(2)/Math.PI * lambda * Math.cos(auxTheta);
-    var mollY = Math.sqrt(2) * Math.sin(auxTheta);
+            var lambda = geoPos[0] * Math.PI / 180; // longitude
+            var theta0 = geoPos[1] * Math.PI / 180;  // latitude
+            var auxTheta = _findTheta(theta0);
 
-    dest[0] = mollX;
-    dest[1] = mollY;
-    dest[2] = 0;
-    return dest;
-};
+            // Transfrom to Mollweide coordinate system
+            var mollX = 2 * Math.sqrt(2) / Math.PI * lambda * Math.cos(auxTheta);
+            var mollY = Math.sqrt(2) * Math.sin(auxTheta);
 
-/**************************************************************************************************************/
+            dest[0] = mollX;
+            dest[1] = mollY;
+            dest[2] = 0;
+            return dest;
+        };
 
-return MollweideCoordinateSystem;
+        /**************************************************************************************************************/
 
-});
+        return MollweideCoordinateSystem;
+
+    });

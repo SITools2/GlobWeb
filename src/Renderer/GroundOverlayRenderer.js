@@ -17,7 +17,7 @@
  * along with GlobWeb. If not, see <http://www.gnu.org/licenses/>.
  ***************************************/
  
-define(['./Program','./Tile'], function(Program,Tile) {
+define(['./Program','../Tiling/Tile'], function(Program,Tile) {
 
 //*************************************************************************
 
