@@ -138,7 +138,11 @@ define(['../Renderer/FeatureStyle', '../Renderer/VectorRendererManager', '../Uti
                         for (var i = response.features.length - 1; i >= 0; i--) {
                             var feature = response.features[i];
                             // Eliminate already added features from response
-                            var alreadyAdded = self.featuresSet.hasOwnProperty(feature.properties.identifier);
+                            //Old version compatibily
+                            if (!feature.hasOwnProperty("id")) {
+                                feature.id = feature.properties.identifier;
+                            }
+                            var alreadyAdded = self.featuresSet.hasOwnProperty(feature.id);
                             if (alreadyAdded)
                                 response.features.splice(i, 1);
 
@@ -218,16 +222,21 @@ define(['../Renderer/FeatureStyle', '../Renderer/VectorRendererManager', '../Uti
             var featureData;
 
             // Add feature if it doesn't exist
-            if (!this.featuresSet.hasOwnProperty(feature.properties.identifier)) {
+            //if ( !this.featuresSet.hasOwnProperty(feature.properties.identifier) )
+            if ( !this.featuresSet.hasOwnProperty(feature.id) )
+	{
                 this.features.push(feature);
                 featureData = {
                     index: this.features.length - 1,
                     tiles: [tile]
                 };
                 this.featuresSet[feature.properties.identifier] = featureData;
+                this.featuresSet[feature.id] = featureData;
             }
-            else {
-                featureData = this.featuresSet[feature.properties.identifier];
+	else
+	{
+                //featureData = this.featuresSet[feature.properties.identifier];
+                featureData = this.featuresSet[feature.id];
 
                 // Store the tile
                 featureData.tiles.push(tile);
@@ -237,10 +246,12 @@ define(['../Renderer/FeatureStyle', '../Renderer/VectorRendererManager', '../Uti
             }
 
             // Add feature id
-            tileData.featureIds.push(feature.properties.identifier);
+            //tileData.featureIds.push( feature.properties.identifier );
+            tileData.featureIds.push( feature.id );
 
             // Set the identifier on the geometry
-            feature.geometry.gid = feature.properties.identifier;
+            //feature.geometry.gid = feature.properties.identifier;
+            feature.geometry.gid = feature.id;
 
             // Add to renderer
             //this.addFeatureToRenderer(feature, tile);
@@ -283,7 +294,8 @@ define(['../Renderer/FeatureStyle', '../Renderer/VectorRendererManager', '../Uti
                     // Set the last feature at the position of the removed feature
                     this.features[featureIt.index] = lastFeature;
                     // Update its index in the Set.
-                    this.featuresSet[lastFeature.properties.identifier].index = featureIt.index;
+                    //this.featuresSet[ lastFeature.properties.identifier ].index = featureIt.index;
+                    this.featuresSet[ lastFeature.id ].index = featureIt.index;
                 }
             }
         }
@@ -295,9 +307,12 @@ define(['../Renderer/FeatureStyle', '../Renderer/VectorRendererManager', '../Uti
          */
         OpenSearchLayer.prototype.modifyFeatureStyle = function (feature, style) {
             feature.properties.style = style;
-            var featureData = this.featuresSet[feature.properties.identifier];
-            if (featureData) {
-                for (var i = 0; i < featureData.tiles.length; i++) {
+            //var featureData = this.featuresSet[feature.properties.identifier];
+            var featureData = this.featuresSet[feature.id];
+	if ( featureData )
+	{
+		for ( var i = 0; i < featureData.tiles.length; i++ )
+		{
                     var tile = featureData.tiles[i];
                     this.globe.vectorRendererManager.removeGeometryFromTile(feature.geometry, tile);
                     this.globe.vectorRendererManager.addGeometryToTile(this, feature.geometry, style, tile);

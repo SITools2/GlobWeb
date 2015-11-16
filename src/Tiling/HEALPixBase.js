@@ -252,8 +252,35 @@ define(['./HEALPixTables', '../Utils/Long'], function (HealPixTables, Long) {
         lonLat2pix: function (order, lon, lat) {
             var loc = lonLat2ang(lon, lat);
             return loc2pix(order, loc[0], loc[1]);
-        }
-    };
+	},
+
+    /**
+     Create the children of the given pixel
+     */
+    getChildren : function (npix) {
+        return [npix * 4, npix * 4 + 1, npix * 4 + 2, npix * 4 + 3];
+    },
+
+    uniq2hpix : function (uniq, hpix) {
+        if (hpix == null)
+            hpix = [];
+        hpix[0] = HEALPixBase.log2(uniq / 4) / 2;
+        var nside = HEALPixBase.pow2(hpix[0]);
+        hpix[1] = uniq - 4 * nside * nside;
+        hpix[0] = parseInt(hpix[0]);
+        return hpix;
+    },
+
+    log2 : function(nside) {
+        var i = 0;
+        while ((nside >>> (++i)) > 0);
+        return --i;
+    },
+
+    pow2 : function(order) {
+        return 1 << order;
+    }
+};
 
     /**************************************************************************************************************/
 

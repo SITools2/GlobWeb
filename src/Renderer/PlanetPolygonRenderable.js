@@ -17,7 +17,7 @@
  * along with GlobWeb. If not, see <http://www.gnu.org/licenses/>.
  ***************************************/
 
- define(['../Utils/Utils','./FeatureStyle','./VectorRendererManager','../Tiling/TiledVectorRenderable','../Tiling/TiledVectorRenderer','../Utils/Numeric'],
+ define(['./Utils','./FeatureStyle','./VectorRendererManager','./TiledVectorRenderable','./TiledVectorRenderer','./Numeric'],
 	function(Utils,FeatureStyle,VectorRendererManager,TiledVectorRenderable,TiledVectorRenderer,Numeric) {
 
 /**************************************************************************************************************/
@@ -27,7 +27,7 @@
  *  @extends TiledVectorRenderable
  *	LineStringRenderable manages lineString data to be rendered on a tile.
  */
-var LineStringRenderable = function( bucket )
+var PlanetPolygonRenderable = function( bucket )
 {
 	TiledVectorRenderable.prototype.constructor.call(this,bucket);
 }
@@ -35,7 +35,7 @@ var LineStringRenderable = function( bucket )
 /**************************************************************************************************************/
 
 // Inheritance
-Utils.inherits(TiledVectorRenderable,LineStringRenderable);
+Utils.inherits(TiledVectorRenderable,PlanetPolygonRenderable);
 
 /**************************************************************************************************************/
 
@@ -44,7 +44,7 @@ Utils.inherits(TiledVectorRenderable,LineStringRenderable);
 /** 
   Check if a geometry crosses the date line
 */
-LineStringRenderable.prototype._fixDateLine = function( tile, coords ) 
+PlanetPolygonRenderable.prototype._fixDateLine = function( tile, coords )
 {		
 	var newCoords = [];
 	var lines = [ newCoords ]
@@ -76,7 +76,7 @@ LineStringRenderable.prototype._fixDateLine = function( tile, coords )
 			}
 		}
 	}
-	newCoords.push( coords[coords.length -1] );
+	newCoords.push( coords[0] );
 	
 	return lines;
 };
@@ -85,7 +85,7 @@ LineStringRenderable.prototype._fixDateLine = function( tile, coords )
  * Build vertices and indices from the coordinates.
  * Clamp a line string on a tile
  */
-LineStringRenderable.prototype.buildVerticesAndIndices = function( tile, coords )
+PlanetPolygonRenderable.prototype.buildVerticesAndIndices = function( tile, coords )
 {
 	if ( coords.length == 0 )
 		return;
@@ -102,7 +102,7 @@ LineStringRenderable.prototype.buildVerticesAndIndices = function( tile, coords 
  * Build vertices and indices from the coordinates.
  * Clamp a line string on a tile
  */
-LineStringRenderable.prototype._buildVerticesAndIndices = function( tile, coords )
+PlanetPolygonRenderable.prototype._buildVerticesAndIndices = function( tile, coords )
 {		
 	var size = tile.config.tesselation;
 	var vs = tile.config.vertexSize;
@@ -228,28 +228,25 @@ LineStringRenderable.prototype._buildVerticesAndIndices = function( tile, coords
 /** @constructor
  *  @extends TiledVectorRenderer
  */
-var LineStringRenderer = function( globe )
+var PlanetPolygonRenderer = function( globe )
 {
 	TiledVectorRenderer.prototype.constructor.call(this,globe);
 }
 
 // Inheritance
-Utils.inherits(TiledVectorRenderer,LineStringRenderer);
+Utils.inherits(TiledVectorRenderer,PlanetPolygonRenderer);
 
 /**************************************************************************************************************/
 
 /**
 	Check if renderer is applicable
  */
-LineStringRenderer.prototype.canApply = function(type,style)
+PlanetPolygonRenderer.prototype.canApply = function(type,style)
 {
 	if ( this.globe.isSky )
 		return false;
 
-	//return (type == "LineString" || type == "MultiLineString"
-	//						|| (!style.fill && (type == "Polygon" || type == "MultiPolygon")))
-	//					&& !style.gradientLength;
-	return (type == "LineString" || type == "MultiLineString")
+	return (!style.fill && (type == "Polygon" || type == "MultiPolygon"))
 						&& !style.gradientLength;
 }
 /**************************************************************************************************************/
@@ -257,7 +254,7 @@ LineStringRenderer.prototype.canApply = function(type,style)
 /**
 	Bucket constructor for LineStringRenderer
  */
-var LineStringBucket = function(layer,style)
+var PlanetPolygonBucket = function(layer,style)
 {
 	this.layer = layer;
 	this.style = new FeatureStyle(style);
@@ -269,9 +266,9 @@ var LineStringBucket = function(layer,style)
 /**
 	Create a renderable for this bucket
  */
-LineStringBucket.prototype.createRenderable = function()
+PlanetPolygonBucket.prototype.createRenderable = function()
 {
-	return new LineStringRenderable(this);
+	return new PlanetPolygonRenderable(this);
 }
 
 /**************************************************************************************************************/
@@ -279,7 +276,7 @@ LineStringBucket.prototype.createRenderable = function()
 /**
 	Check if a bucket is compatible
  */
-LineStringBucket.prototype.isCompatible = function(style)
+PlanetPolygonBucket.prototype.isCompatible = function(style)
 {
 	return this.style.strokeColor[0] == style.strokeColor[0]
 		&& this.style.strokeColor[1] == style.strokeColor[1]
@@ -293,18 +290,18 @@ LineStringBucket.prototype.isCompatible = function(style)
 /**
 	Get or create a bucket to store a feature with the given style
  */
-LineStringRenderer.prototype.createBucket = function( layer, style )
+PlanetPolygonRenderer.prototype.createBucket = function( layer, style )
 {
 	// Create a bucket
-	return new LineStringBucket(layer,style);
+	return new PlanetPolygonBucket(layer,style);
 }
 
 /**************************************************************************************************************/
 
 // Register the renderer
-VectorRendererManager.factory.push( function(globe) { return new LineStringRenderer(globe); } );
+VectorRendererManager.factory.push( function(globe) { return new PlanetPolygonRenderer(globe); } );
 				
-return LineStringRenderable;
+return PlanetPolygonRenderable;
 
 });
 
