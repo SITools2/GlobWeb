@@ -45,6 +45,7 @@ define(["../Utils/Event", "../Utils/Utils"], function (Event, Utils) {
         this.description = options && options.hasOwnProperty('description') ? options['description'] : "";
         this._visible = options && options.hasOwnProperty('visible') ? options['visible'] : true;
         this._opacity = options && options.hasOwnProperty('opacity') ? options['opacity'] : 1.0;
+        this.properties = options && options.hasOwnProperty('properties') ? options['properties'] : {};
     }
 
     /**************************************************************************************************************/
