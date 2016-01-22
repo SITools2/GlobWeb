@@ -35,7 +35,7 @@
 //	- Comments some not needed functions
 //	- Add mat4.project and mat4.rotateVec3
 
-define( function () {
+define([], function () {
 
     // Tweak to your liking
     var FLOAT_EPSILON = 0.000001;
@@ -45,13 +45,13 @@ define( function () {
      * @name MatrixArray
      */
     var MatrixArray = Array;
-    
+
     /**
      * @class 3 Dimensional Vector
      * @name vec3
      */
     var vec3 = {};
-     
+
     /**
      * Creates a new instance of a vec3 using the default array type
      * Any javascript array-like objects containing at least 3 numeric elements can serve as a vec3
@@ -119,10 +119,10 @@ define( function () {
      */
     vec3.equal = function (a, b) {
         return a === b || (
-            Math.abs(a[0] - b[0]) < FLOAT_EPSILON &&
-            Math.abs(a[1] - b[1]) < FLOAT_EPSILON &&
-            Math.abs(a[2] - b[2]) < FLOAT_EPSILON
-        );
+                Math.abs(a[0] - b[0]) < FLOAT_EPSILON &&
+                Math.abs(a[1] - b[1]) < FLOAT_EPSILON &&
+                Math.abs(a[2] - b[2]) < FLOAT_EPSILON
+            );
     };
 
     /**
@@ -203,7 +203,9 @@ define( function () {
      * @returns {vec3} dest if specified, vec otherwise
      */
     vec3.negate = function (vec, dest) {
-        if (!dest) { dest = vec; }
+        if (!dest) {
+            dest = vec;
+        }
 
         dest[0] = -vec[0];
         dest[1] = -vec[1];
@@ -244,7 +246,9 @@ define( function () {
      * @returns {vec3} dest if specified, vec otherwise
      */
     vec3.normalize = function (vec, dest) {
-        if (!dest) { dest = vec; }
+        if (!dest) {
+            dest = vec;
+        }
 
         var x = vec[0], y = vec[1], z = vec[2],
             len = Math.sqrt(x * x + y * y + z * z);
@@ -278,7 +282,9 @@ define( function () {
      * @returns {vec3} dest if specified, vec otherwise
      */
     vec3.cross = function (vec, vec2, dest) {
-        if (!dest) { dest = vec; }
+        if (!dest) {
+            dest = vec;
+        }
 
         var x = vec[0], y = vec[1], z = vec[2],
             x2 = vec2[0], y2 = vec2[1], z2 = vec2[2];
@@ -334,27 +340,27 @@ define( function () {
      *
      * @returns {vec3} dest if specified, vec otherwise
      */
-/*   vec3.direction = function (vec, vec2, dest) {
-        if (!dest) { dest = vec; }
+    /*   vec3.direction = function (vec, vec2, dest) {
+     if (!dest) { dest = vec; }
 
-        var x = vec[0] - vec2[0],
-            y = vec[1] - vec2[1],
-            z = vec[2] - vec2[2],
-            len = Math.sqrt(x * x + y * y + z * z);
+     var x = vec[0] - vec2[0],
+     y = vec[1] - vec2[1],
+     z = vec[2] - vec2[2],
+     len = Math.sqrt(x * x + y * y + z * z);
 
-        if (!len) {
-            dest[0] = 0;
-            dest[1] = 0;
-            dest[2] = 0;
-            return dest;
-        }
+     if (!len) {
+     dest[0] = 0;
+     dest[1] = 0;
+     dest[2] = 0;
+     return dest;
+     }
 
-        len = 1 / len;
-        dest[0] = x * len;
-        dest[1] = y * len;
-        dest[2] = z * len;
-        return dest;
-    };*/
+     len = 1 / len;
+     dest[0] = x * len;
+     dest[1] = y * len;
+     dest[2] = z * len;
+     return dest;
+     };*/
 
     /**
      * Performs a linear interpolation between two vec3
@@ -367,7 +373,9 @@ define( function () {
      * @returns {vec3} dest if specified, vec otherwise
      */
     vec3.lerp = function (vec, vec2, lerp, dest) {
-        if (!dest) { dest = vec; }
+        if (!dest) {
+            dest = vec;
+        }
 
         dest[0] = vec[0] + lerp * (vec2[0] - vec[0]);
         dest[1] = vec[1] + lerp * (vec2[1] - vec[1]);
@@ -389,8 +397,17 @@ define( function () {
         var x = vec2[0] - vec[0],
             y = vec2[1] - vec[1],
             z = vec2[2] - vec[2];
-            
-        return Math.sqrt(x*x + y*y + z*z);
+
+        return Math.sqrt(x * x + y * y + z * z);
+    };
+
+    /** Vector cross product.
+     @param v1 vector
+     @param v2 another vector
+     @return number vector cross product between this vector and {@code v}
+     */
+    vec3.angle = function (v1, v2) {
+        return Math.atan2(vec3.length(vec3.cross(v1, v2)), vec3.dot(v1, v2));
     };
 
     // Pre-allocated to prevent unecessary garbage collection
@@ -408,39 +425,39 @@ define( function () {
      *
      * @returns {vec3} dest if specified, vec otherwise
      */
- /*   vec3.unproject = function (vec, view, proj, viewport, dest) {
-        if (!dest) { dest = vec; }
+    /*   vec3.unproject = function (vec, view, proj, viewport, dest) {
+     if (!dest) { dest = vec; }
 
-        if(!unprojectMat) {
-            unprojectMat = mat4.create();
-        }
+     if(!unprojectMat) {
+     unprojectMat = mat4.create();
+     }
 
-        var m = unprojectMat;
-        var v = unprojectVec;
-        
-        v[0] = (vec[0] - viewport[0]) * 2.0 / viewport[2] - 1.0;
-        v[1] = (vec[1] - viewport[1]) * 2.0 / viewport[3] - 1.0;
-        v[2] = 2.0 * vec[2] - 1.0;
-        v[3] = 1.0;
-        
-        mat4.multiply(proj, view, m);
-        if(!mat4.inverse(m)) { return null; }
-        
-        mat4.multiplyVec4(m, v);
-        if(v[3] === 0.0) { return null; }
+     var m = unprojectMat;
+     var v = unprojectVec;
 
-        dest[0] = v[0] / v[3];
-        dest[1] = v[1] / v[3];
-        dest[2] = v[2] / v[3];
-        
-        return dest;
-    };*/
+     v[0] = (vec[0] - viewport[0]) * 2.0 / viewport[2] - 1.0;
+     v[1] = (vec[1] - viewport[1]) * 2.0 / viewport[3] - 1.0;
+     v[2] = 2.0 * vec[2] - 1.0;
+     v[3] = 1.0;
 
-/*    var xUnitVec3 = vec3.createFrom(1,0,0);
-    var yUnitVec3 = vec3.createFrom(0,1,0);
-    var zUnitVec3 = vec3.createFrom(0,0,1);
+     mat4.multiply(proj, view, m);
+     if(!mat4.inverse(m)) { return null; }
 
-    var tmpvec3 = vec3.create();*/
+     mat4.multiplyVec4(m, v);
+     if(v[3] === 0.0) { return null; }
+
+     dest[0] = v[0] / v[3];
+     dest[1] = v[1] / v[3];
+     dest[2] = v[2] / v[3];
+
+     return dest;
+     };*/
+
+    /*    var xUnitVec3 = vec3.createFrom(1,0,0);
+     var yUnitVec3 = vec3.createFrom(0,1,0);
+     var zUnitVec3 = vec3.createFrom(0,0,1);
+
+     var tmpvec3 = vec3.create();*/
     /**
      * Generates a quaternion of rotation between two given normalized vectors
      *
@@ -450,35 +467,35 @@ define( function () {
      *
      * @returns {quat4} dest if specified, a new quat4 otherwise
      */
-/*    vec3.rotationTo = function (a, b, dest) {
-        if (!dest) { dest = quat4.create(); }
-        
-        var d = vec3.dot(a, b);
-        var axis = tmpvec3;
-        if (d >= 1.0) {
-            quat4.set(identityQuat4, dest);
-        } else if (d < (0.000001 - 1.0)) {
-            vec3.cross(xUnitVec3, a, axis);
-            if (vec3.length(axis) < 0.000001)
-                vec3.cross(yUnitVec3, a, axis);
-            if (vec3.length(axis) < 0.000001)
-                vec3.cross(zUnitVec3, a, axis);
-            vec3.normalize(axis);
-            quat4.fromAngleAxis(Math.PI, axis, dest);
-        } else {
-            var s = Math.sqrt((1.0 + d) * 2.0);
-            var sInv = 1.0 / s;
-            vec3.cross(a, b, axis);
-            dest[0] = axis[0] * sInv;
-            dest[1] = axis[1] * sInv;
-            dest[2] = axis[2] * sInv;
-            dest[3] = s * 0.5;
-            quat4.normalize(dest);
-        }
-        if (dest[3] > 1.0) dest[3] = 1.0;
-        else if (dest[3] < -1.0) dest[3] = -1.0;
-        return dest;
-    };*/
+    /*    vec3.rotationTo = function (a, b, dest) {
+     if (!dest) { dest = quat4.create(); }
+
+     var d = vec3.dot(a, b);
+     var axis = tmpvec3;
+     if (d >= 1.0) {
+     quat4.set(identityQuat4, dest);
+     } else if (d < (0.000001 - 1.0)) {
+     vec3.cross(xUnitVec3, a, axis);
+     if (vec3.length(axis) < 0.000001)
+     vec3.cross(yUnitVec3, a, axis);
+     if (vec3.length(axis) < 0.000001)
+     vec3.cross(zUnitVec3, a, axis);
+     vec3.normalize(axis);
+     quat4.fromAngleAxis(Math.PI, axis, dest);
+     } else {
+     var s = Math.sqrt((1.0 + d) * 2.0);
+     var sInv = 1.0 / s;
+     vec3.cross(a, b, axis);
+     dest[0] = axis[0] * sInv;
+     dest[1] = axis[1] * sInv;
+     dest[2] = axis[2] * sInv;
+     dest[3] = s * 0.5;
+     quat4.normalize(dest);
+     }
+     if (dest[3] > 1.0) dest[3] = 1.0;
+     else if (dest[3] < -1.0) dest[3] = -1.0;
+     return dest;
+     };*/
 
     /**
      * Returns a string representation of a vector
@@ -490,20 +507,119 @@ define( function () {
     vec3.str = function (vec) {
         return '[' + vec[0] + ', ' + vec[1] + ', ' + vec[2] + ']';
     };
-	
-	/**
-	 * @class 3x3 Matrix
-	 * @name mat3
-	 */
+
+
+    // Vec3 lib used for Astro Math lib
+
+    vec3.createZPhi = function (z, phi) {
+        var sth = Math.sqrt((1.0 - z) * (1.0 + z));
+        var x = sth * Math.cos(phi);
+        var y = sth * Math.sin(phi);
+        return vec3.createFrom(x, y, z);
+    };
+
+    vec3.createPhiTheta = function (phi, theta) {
+        var sth = Math.sin(theta);
+        var x = sth * Math.cos(phi);
+        var y = sth * Math.sin(phi);
+        var z = sth * Math.cos(theta);
+        return vec3.createFrom(x, y, z);
+    };
+
+    vec3.add2 = function (vec, vec2) {
+        var x1 = vec[0];
+        var y1 = vec[1];
+        var z1 = vec[2];
+        var x2 = vec2[0];
+        var y2 = vec2[1];
+        var z2 = vec2[2];
+
+        return [x1 + x2, y1 + y2, z1 + z2];
+    };
+
+    vec3.subtract2 = function (vec, vec2) {
+        var x1 = vec[0];
+        var y1 = vec[1];
+        var z1 = vec[2];
+        var x2 = vec2[0];
+        var y2 = vec2[1];
+        var z2 = vec2[2];
+
+        return [x1 - x2, y1 - y2, z1 - z2];
+    };
+
+    vec3.flip = function (vec) {
+        var x = vec[0];
+        var y = vec[1];
+        var z = vec[2];
+
+        return [x = -x, y = -y, z = -z];
+    };
+
+    vec3.scale2 = function (vec, val) {
+        var x = vec.x;
+        var y = vec.y;
+        var z = vec.z;
+
+        return {
+            x: x * val,
+            y: y *= val,
+            z: z *= val
+        };
+    };
+
+    vec3.normalize2 = function (vec) {
+
+        var x = vec[0];
+        var y = vec[1];
+        var z = vec[2];
+        var d = 1. / Math.sqrt(x * x + y * y + z * z);
+
+        return [x *= d, y *= d, z *= d];
+    };
+
+    vec3.cross2 = function (vec, vec2) {
+        return {
+            x: vec[1] * vec2[2] - vec2[1] * vec[2],
+            y: vec[2] * vec2[0] - vec2[2] * vec[0],
+            z: vec[0] * vec2[1] - vec2[0] * vec[1]
+        };
+    };
+
+    vec3.length2 = function (vec) {
+        var x = vec.x, y = vec.y, z = vec.z;
+        return Math.sqrt(x * x + y * y + z * z);
+    };
+
+    vec3.dot2 = function (vec, vec2) {
+        var x1 = (vec.x != undefined) ? vec.x : vec[0];
+        var y1 = (vec.y != undefined) ? vec.y : vec[1];
+        var z1 = (vec.z != undefined) ? vec.z : vec[2];
+        var x2 = (vec2.x != undefined) ? vec2.x : vec2[0];
+        var y2 = (vec2.y != undefined) ? vec2.y : vec2[1];
+        var z2 = (vec2.z != undefined) ? vec2.z : vec2[2];
+
+        return x1 * x2 + y1 * y2 + z1 * z2;
+    };
+
+    vec3.angle2 = function (v1, v2) {
+        return Math.atan2(vec3.length2(vec3.cross2(v1, v2)), vec3.dot2(v1, v2));
+    };
+    //
+
+    /**
+     * @class 3x3 Matrix
+     * @name mat3
+     */
     var mat3 = {};
-	
-	/**
-	 * Creates a new isntance of mat3
-	 *
+
+    /**
+     * Creates a new isntance of mat3
+     *
      * @param {mat3} [mat] mat3 containing values to initialize with
-	 *
-	 * @returns {mat3} a new 3x3 matrix
-	 */
+     *
+     * @returns {mat3} a new 3x3 matrix
+     */
     mat3.create = function (mat) {
         var dest = new MatrixArray(9);
 
@@ -583,28 +699,28 @@ define( function () {
 
      * @returns {mat4} New mat4
      */
- /*   mat4.createFrom = function (m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33) {
-        var dest = new MatrixArray(16);
+    /*   mat4.createFrom = function (m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33) {
+     var dest = new MatrixArray(16);
 
-        dest[0] = m00;
-        dest[1] = m01;
-        dest[2] = m02;
-        dest[3] = m03;
-        dest[4] = m10;
-        dest[5] = m11;
-        dest[6] = m12;
-        dest[7] = m13;
-        dest[8] = m20;
-        dest[9] = m21;
-        dest[10] = m22;
-        dest[11] = m23;
-        dest[12] = m30;
-        dest[13] = m31;
-        dest[14] = m32;
-        dest[15] = m33;
+     dest[0] = m00;
+     dest[1] = m01;
+     dest[2] = m02;
+     dest[3] = m03;
+     dest[4] = m10;
+     dest[5] = m11;
+     dest[6] = m12;
+     dest[7] = m13;
+     dest[8] = m20;
+     dest[9] = m21;
+     dest[10] = m22;
+     dest[11] = m23;
+     dest[12] = m30;
+     dest[13] = m31;
+     dest[14] = m32;
+     dest[15] = m33;
 
-        return dest;
-    };*/
+     return dest;
+     };*/
 
     /**
      * Copies the values of one mat4 to another
@@ -642,26 +758,26 @@ define( function () {
      *
      * @returns {Boolean} True if a is equivalent to b
      */
-/*    mat4.equal = function (a, b) {
-        return a === b || (
-            Math.abs(a[0] - b[0]) < FLOAT_EPSILON &&
-            Math.abs(a[1] - b[1]) < FLOAT_EPSILON &&
-            Math.abs(a[2] - b[2]) < FLOAT_EPSILON &&
-            Math.abs(a[3] - b[3]) < FLOAT_EPSILON &&
-            Math.abs(a[4] - b[4]) < FLOAT_EPSILON &&
-            Math.abs(a[5] - b[5]) < FLOAT_EPSILON &&
-            Math.abs(a[6] - b[6]) < FLOAT_EPSILON &&
-            Math.abs(a[7] - b[7]) < FLOAT_EPSILON &&
-            Math.abs(a[8] - b[8]) < FLOAT_EPSILON &&
-            Math.abs(a[9] - b[9]) < FLOAT_EPSILON &&
-            Math.abs(a[10] - b[10]) < FLOAT_EPSILON &&
-            Math.abs(a[11] - b[11]) < FLOAT_EPSILON &&
-            Math.abs(a[12] - b[12]) < FLOAT_EPSILON &&
-            Math.abs(a[13] - b[13]) < FLOAT_EPSILON &&
-            Math.abs(a[14] - b[14]) < FLOAT_EPSILON &&
-            Math.abs(a[15] - b[15]) < FLOAT_EPSILON
-        );
-    };*/
+    /*    mat4.equal = function (a, b) {
+     return a === b || (
+     Math.abs(a[0] - b[0]) < FLOAT_EPSILON &&
+     Math.abs(a[1] - b[1]) < FLOAT_EPSILON &&
+     Math.abs(a[2] - b[2]) < FLOAT_EPSILON &&
+     Math.abs(a[3] - b[3]) < FLOAT_EPSILON &&
+     Math.abs(a[4] - b[4]) < FLOAT_EPSILON &&
+     Math.abs(a[5] - b[5]) < FLOAT_EPSILON &&
+     Math.abs(a[6] - b[6]) < FLOAT_EPSILON &&
+     Math.abs(a[7] - b[7]) < FLOAT_EPSILON &&
+     Math.abs(a[8] - b[8]) < FLOAT_EPSILON &&
+     Math.abs(a[9] - b[9]) < FLOAT_EPSILON &&
+     Math.abs(a[10] - b[10]) < FLOAT_EPSILON &&
+     Math.abs(a[11] - b[11]) < FLOAT_EPSILON &&
+     Math.abs(a[12] - b[12]) < FLOAT_EPSILON &&
+     Math.abs(a[13] - b[13]) < FLOAT_EPSILON &&
+     Math.abs(a[14] - b[14]) < FLOAT_EPSILON &&
+     Math.abs(a[15] - b[15]) < FLOAT_EPSILON
+     );
+     };*/
 
     /**
      * Sets a mat4 to an identity matrix
@@ -671,7 +787,9 @@ define( function () {
      * @returns {mat4} dest
      */
     mat4.identity = function (dest) {
-        if (!dest) { dest = mat4.create(); }
+        if (!dest) {
+            dest = mat4.create();
+        }
         dest[0] = 1;
         dest[1] = 0;
         dest[2] = 0;
@@ -755,11 +873,11 @@ define( function () {
             a30 = mat[12], a31 = mat[13], a32 = mat[14], a33 = mat[15];
 
         return (a30 * a21 * a12 * a03 - a20 * a31 * a12 * a03 - a30 * a11 * a22 * a03 + a10 * a31 * a22 * a03 +
-                a20 * a11 * a32 * a03 - a10 * a21 * a32 * a03 - a30 * a21 * a02 * a13 + a20 * a31 * a02 * a13 +
-                a30 * a01 * a22 * a13 - a00 * a31 * a22 * a13 - a20 * a01 * a32 * a13 + a00 * a21 * a32 * a13 +
-                a30 * a11 * a02 * a23 - a10 * a31 * a02 * a23 - a30 * a01 * a12 * a23 + a00 * a31 * a12 * a23 +
-                a10 * a01 * a32 * a23 - a00 * a11 * a32 * a23 - a20 * a11 * a02 * a33 + a10 * a21 * a02 * a33 +
-                a20 * a01 * a12 * a33 - a00 * a21 * a12 * a33 - a10 * a01 * a22 * a33 + a00 * a11 * a22 * a33);
+        a20 * a11 * a32 * a03 - a10 * a21 * a32 * a03 - a30 * a21 * a02 * a13 + a20 * a31 * a02 * a13 +
+        a30 * a01 * a22 * a13 - a00 * a31 * a22 * a13 - a20 * a01 * a32 * a13 + a00 * a21 * a32 * a13 +
+        a30 * a11 * a02 * a23 - a10 * a31 * a02 * a23 - a30 * a01 * a12 * a23 + a00 * a31 * a12 * a23 +
+        a10 * a01 * a32 * a23 - a00 * a11 * a32 * a23 - a20 * a11 * a02 * a33 + a10 * a21 * a02 * a33 +
+        a20 * a01 * a12 * a33 - a00 * a21 * a12 * a33 - a10 * a01 * a22 * a33 + a00 * a11 * a22 * a33);
     };
 
     /**
@@ -771,7 +889,9 @@ define( function () {
      * @param {mat4} dest is specified, mat otherwise, null if matrix cannot be inverted
      */
     mat4.inverse = function (mat, dest) {
-        if (!dest) { dest = mat; }
+        if (!dest) {
+            dest = mat;
+        }
 
         // Cache the matrix values (makes for huge speed increases!)
         var a00 = mat[0], a01 = mat[1], a02 = mat[2], a03 = mat[3],
@@ -795,9 +915,11 @@ define( function () {
             d = (b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06),
             invDet;
 
-            // Calculate the determinant
-            if (!d) { return null; }
-            invDet = 1 / d;
+        // Calculate the determinant
+        if (!d) {
+            return null;
+        }
+        invDet = 1 / d;
 
         dest[0] = (a11 * b11 - a12 * b10 + a13 * b09) * invDet;
         dest[1] = (-a01 * b11 + a02 * b10 - a03 * b09) * invDet;
@@ -828,7 +950,9 @@ define( function () {
      * @returns {mat4} dest is specified, a new mat4 otherwise
      */
     mat4.toRotationMat = function (mat, dest) {
-        if (!dest) { dest = mat4.create(); }
+        if (!dest) {
+            dest = mat4.create();
+        }
 
         dest[0] = mat[0];
         dest[1] = mat[1];
@@ -859,7 +983,9 @@ define( function () {
      * @returns {mat3} dest is specified, a new mat3 otherwise
      */
     mat4.toMat3 = function (mat, dest) {
-        if (!dest) { dest = mat3.create(); }
+        if (!dest) {
+            dest = mat3.create();
+        }
 
         dest[0] = mat[0];
         dest[1] = mat[1];
@@ -884,36 +1010,36 @@ define( function () {
      *
      * @returns {mat3} dest is specified, a new mat3 otherwise, null if the matrix cannot be inverted
      */
- /*   mat4.toInverseMat3 = function (mat, dest) {
-        // Cache the matrix values (makes for huge speed increases!)
-        var a00 = mat[0], a01 = mat[1], a02 = mat[2],
-            a10 = mat[4], a11 = mat[5], a12 = mat[6],
-            a20 = mat[8], a21 = mat[9], a22 = mat[10],
+    /*   mat4.toInverseMat3 = function (mat, dest) {
+     // Cache the matrix values (makes for huge speed increases!)
+     var a00 = mat[0], a01 = mat[1], a02 = mat[2],
+     a10 = mat[4], a11 = mat[5], a12 = mat[6],
+     a20 = mat[8], a21 = mat[9], a22 = mat[10],
 
-            b01 = a22 * a11 - a12 * a21,
-            b11 = -a22 * a10 + a12 * a20,
-            b21 = a21 * a10 - a11 * a20,
+     b01 = a22 * a11 - a12 * a21,
+     b11 = -a22 * a10 + a12 * a20,
+     b21 = a21 * a10 - a11 * a20,
 
-            d = a00 * b01 + a01 * b11 + a02 * b21,
-            id;
+     d = a00 * b01 + a01 * b11 + a02 * b21,
+     id;
 
-        if (!d) { return null; }
-        id = 1 / d;
+     if (!d) { return null; }
+     id = 1 / d;
 
-        if (!dest) { dest = mat3.create(); }
+     if (!dest) { dest = mat3.create(); }
 
-        dest[0] = b01 * id;
-        dest[1] = (-a22 * a01 + a02 * a21) * id;
-        dest[2] = (a12 * a01 - a02 * a11) * id;
-        dest[3] = b11 * id;
-        dest[4] = (a22 * a00 - a02 * a20) * id;
-        dest[5] = (-a12 * a00 + a02 * a10) * id;
-        dest[6] = b21 * id;
-        dest[7] = (-a21 * a00 + a01 * a20) * id;
-        dest[8] = (a11 * a00 - a01 * a10) * id;
+     dest[0] = b01 * id;
+     dest[1] = (-a22 * a01 + a02 * a21) * id;
+     dest[2] = (a12 * a01 - a02 * a11) * id;
+     dest[3] = b11 * id;
+     dest[4] = (a22 * a00 - a02 * a20) * id;
+     dest[5] = (-a12 * a00 + a02 * a10) * id;
+     dest[6] = b21 * id;
+     dest[7] = (-a21 * a00 + a01 * a20) * id;
+     dest[8] = (a11 * a00 - a01 * a10) * id;
 
-        return dest;
-    };*/
+     return dest;
+     };*/
 
     /**
      * Performs a matrix multiplication
@@ -925,47 +1051,49 @@ define( function () {
      * @returns {mat4} dest if specified, mat otherwise
      */
     mat4.multiply = function (mat, mat2, dest) {
-        if (!dest) { dest = mat; }
+        if (!dest) {
+            dest = mat;
+        }
 
         // Cache the matrix values (makes for huge speed increases!)
-        var a00 = mat[ 0], a01 = mat[ 1], a02 = mat[ 2], a03 = mat[3];
-        var a10 = mat[ 4], a11 = mat[ 5], a12 = mat[ 6], a13 = mat[7];
-        var a20 = mat[ 8], a21 = mat[ 9], a22 = mat[10], a23 = mat[11];
+        var a00 = mat[0], a01 = mat[1], a02 = mat[2], a03 = mat[3];
+        var a10 = mat[4], a11 = mat[5], a12 = mat[6], a13 = mat[7];
+        var a20 = mat[8], a21 = mat[9], a22 = mat[10], a23 = mat[11];
         var a30 = mat[12], a31 = mat[13], a32 = mat[14], a33 = mat[15];
 
         // Cache only the current line of the second matrix
-        var b0  = mat2[0], b1 = mat2[1], b2 = mat2[2], b3 = mat2[3];  
-        dest[0] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
-        dest[1] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
-        dest[2] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
-        dest[3] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+        var b0 = mat2[0], b1 = mat2[1], b2 = mat2[2], b3 = mat2[3];
+        dest[0] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+        dest[1] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+        dest[2] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+        dest[3] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
 
         b0 = mat2[4];
         b1 = mat2[5];
         b2 = mat2[6];
         b3 = mat2[7];
-        dest[4] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
-        dest[5] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
-        dest[6] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
-        dest[7] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+        dest[4] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+        dest[5] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+        dest[6] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+        dest[7] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
 
         b0 = mat2[8];
         b1 = mat2[9];
         b2 = mat2[10];
         b3 = mat2[11];
-        dest[8] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
-        dest[9] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
-        dest[10] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
-        dest[11] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+        dest[8] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+        dest[9] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+        dest[10] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+        dest[11] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
 
         b0 = mat2[12];
         b1 = mat2[13];
         b2 = mat2[14];
         b3 = mat2[15];
-        dest[12] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
-        dest[13] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
-        dest[14] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
-        dest[15] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+        dest[12] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+        dest[13] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+        dest[14] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+        dest[15] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
 
         return dest;
     };
@@ -981,7 +1109,9 @@ define( function () {
      * @returns {vec3} dest if specified, vec otherwise
      */
     mat4.multiplyVec3 = function (mat, vec, dest) {
-        if (!dest) { dest = vec; }
+        if (!dest) {
+            dest = vec;
+        }
 
         var x = vec[0], y = vec[1], z = vec[2];
 
@@ -1002,7 +1132,9 @@ define( function () {
      * @returns {vec4} dest if specified, vec otherwise
      */
     mat4.multiplyVec4 = function (mat, vec, dest) {
-        if (!dest) { dest = vec; }
+        if (!dest) {
+            dest = vec;
+        }
 
         var x = vec[0], y = vec[1], z = vec[2], w = vec[3];
 
@@ -1014,44 +1146,47 @@ define( function () {
         return dest;
     };
 
-	/**
-	  Project a vec3
-	*/
-	mat4.project = function(mat, vec, dest)
-	{
-		if(!dest) { dest = vec }
-		mat4.multiplyVec4( mat, vec, dest );
-		var iw = 1.0 / dest[3];
-		dest[0] *= iw;
-		dest[1] *= iw;
-		dest[2] *= iw;
-		return dest;
-	}
+    /**
+     Project a vec3
+     */
+    mat4.project = function (mat, vec, dest) {
+        if (!dest) {
+            dest = vec
+        }
+        mat4.multiplyVec4(mat, vec, dest);
+        var iw = 1.0 / dest[3];
+        dest[0] *= iw;
+        dest[1] *= iw;
+        dest[2] *= iw;
+        return dest;
+    }
 
-	/**
-	 * mat4.rotateVec3
-	 * Rotate a vec3 with the given matrix
-	 *
-	 * Params:
-	 * mat - mat4 to transform the vector with
-	 * vec - vec3 to transform
-	 * dest - Optional, vec3 receiving operation result. If not specified result is written to vec
-	 *
-	 * Returns:
-	 * dest if specified, vec otherwise
-	 */
-	mat4.rotateVec3 = function(mat, vec, dest) {
-		if(!dest) { dest = vec }
-		
-		var x = vec[0], y = vec[1], z = vec[2];
-		
-		dest[0] = mat[0]*x + mat[4]*y + mat[8]*z;
-		dest[1] = mat[1]*x + mat[5]*y + mat[9]*z;
-		dest[2] = mat[2]*x + mat[6]*y + mat[10]*z;
-		
-		return dest;
-	};
-	
+    /**
+     * mat4.rotateVec3
+     * Rotate a vec3 with the given matrix
+     *
+     * Params:
+     * mat - mat4 to transform the vector with
+     * vec - vec3 to transform
+     * dest - Optional, vec3 receiving operation result. If not specified result is written to vec
+     *
+     * Returns:
+     * dest if specified, vec otherwise
+     */
+    mat4.rotateVec3 = function (mat, vec, dest) {
+        if (!dest) {
+            dest = vec
+        }
+
+        var x = vec[0], y = vec[1], z = vec[2];
+
+        dest[0] = mat[0] * x + mat[4] * y + mat[8] * z;
+        dest[1] = mat[1] * x + mat[5] * y + mat[9] * z;
+        dest[2] = mat[2] * x + mat[6] * y + mat[10] * z;
+
+        return dest;
+    };
+
     /**
      * Translates a matrix by the given vector
      *
@@ -1075,13 +1210,31 @@ define( function () {
             return mat;
         }
 
-        a00 = mat[0]; a01 = mat[1]; a02 = mat[2]; a03 = mat[3];
-        a10 = mat[4]; a11 = mat[5]; a12 = mat[6]; a13 = mat[7];
-        a20 = mat[8]; a21 = mat[9]; a22 = mat[10]; a23 = mat[11];
+        a00 = mat[0];
+        a01 = mat[1];
+        a02 = mat[2];
+        a03 = mat[3];
+        a10 = mat[4];
+        a11 = mat[5];
+        a12 = mat[6];
+        a13 = mat[7];
+        a20 = mat[8];
+        a21 = mat[9];
+        a22 = mat[10];
+        a23 = mat[11];
 
-        dest[0] = a00; dest[1] = a01; dest[2] = a02; dest[3] = a03;
-        dest[4] = a10; dest[5] = a11; dest[6] = a12; dest[7] = a13;
-        dest[8] = a20; dest[9] = a21; dest[10] = a22; dest[11] = a23;
+        dest[0] = a00;
+        dest[1] = a01;
+        dest[2] = a02;
+        dest[3] = a03;
+        dest[4] = a10;
+        dest[5] = a11;
+        dest[6] = a12;
+        dest[7] = a13;
+        dest[8] = a20;
+        dest[9] = a21;
+        dest[10] = a22;
+        dest[11] = a23;
 
         dest[12] = a00 * x + a10 * y + a20 * z + mat[12];
         dest[13] = a01 * x + a11 * y + a21 * z + mat[13];
@@ -1159,7 +1312,9 @@ define( function () {
             b10, b11, b12,
             b20, b21, b22;
 
-        if (!len) { return null; }
+        if (!len) {
+            return null;
+        }
         if (len !== 1) {
             len = 1 / len;
             x *= len;
@@ -1171,14 +1326,29 @@ define( function () {
         c = Math.cos(angle);
         t = 1 - c;
 
-        a00 = mat[0]; a01 = mat[1]; a02 = mat[2]; a03 = mat[3];
-        a10 = mat[4]; a11 = mat[5]; a12 = mat[6]; a13 = mat[7];
-        a20 = mat[8]; a21 = mat[9]; a22 = mat[10]; a23 = mat[11];
+        a00 = mat[0];
+        a01 = mat[1];
+        a02 = mat[2];
+        a03 = mat[3];
+        a10 = mat[4];
+        a11 = mat[5];
+        a12 = mat[6];
+        a13 = mat[7];
+        a20 = mat[8];
+        a21 = mat[9];
+        a22 = mat[10];
+        a23 = mat[11];
 
         // Construct the elements of the rotation matrix
-        b00 = x * x * t + c; b01 = y * x * t + z * s; b02 = z * x * t - y * s;
-        b10 = x * y * t - z * s; b11 = y * y * t + c; b12 = z * y * t + x * s;
-        b20 = x * z * t + y * s; b21 = y * z * t - x * s; b22 = z * z * t + c;
+        b00 = x * x * t + c;
+        b01 = y * x * t + z * s;
+        b02 = z * x * t - y * s;
+        b10 = x * y * t - z * s;
+        b11 = y * y * t + c;
+        b12 = z * y * t + x * s;
+        b20 = x * z * t + y * s;
+        b21 = y * z * t - x * s;
+        b22 = z * z * t + c;
 
         if (!dest) {
             dest = mat;
@@ -1366,7 +1536,9 @@ define( function () {
      * @returns {mat4} dest if specified, a new mat4 otherwise
      */
     mat4.frustum = function (left, right, bottom, top, near, far, dest) {
-        if (!dest) { dest = mat4.create(); }
+        if (!dest) {
+            dest = mat4.create();
+        }
         var rl = (right - left),
             tb = (top - bottom),
             fn = (far - near);
@@ -1420,7 +1592,9 @@ define( function () {
      * @returns {mat4} dest if specified, a new mat4 otherwise
      */
     mat4.ortho = function (left, right, bottom, top, near, far, dest) {
-        if (!dest) { dest = mat4.create(); }
+        if (!dest) {
+            dest = mat4.create();
+        }
         var rl = (right - left),
             tb = (top - bottom),
             fn = (far - near);
@@ -1454,7 +1628,9 @@ define( function () {
      * @returns {mat4} dest if specified, a new mat4 otherwise
      */
     mat4.lookAt = function (eye, center, up, dest) {
-        if (!dest) { dest = mat4.create(); }
+        if (!dest) {
+            dest = mat4.create();
+        }
 
         var x0, x1, x2, y0, y1, y2, z0, z1, z2, len,
             eyex = eye[0],
@@ -1551,44 +1727,44 @@ define( function () {
      *
      * @returns {mat4} dest if specified, a new mat4 otherwise
      */
-/*    mat4.fromRotationTranslation = function (quat, vec, dest) {
-        if (!dest) { dest = mat4.create(); }
+    /*    mat4.fromRotationTranslation = function (quat, vec, dest) {
+     if (!dest) { dest = mat4.create(); }
 
-        // Quaternion math
-        var x = quat[0], y = quat[1], z = quat[2], w = quat[3],
-            x2 = x + x,
-            y2 = y + y,
-            z2 = z + z,
+     // Quaternion math
+     var x = quat[0], y = quat[1], z = quat[2], w = quat[3],
+     x2 = x + x,
+     y2 = y + y,
+     z2 = z + z,
 
-            xx = x * x2,
-            xy = x * y2,
-            xz = x * z2,
-            yy = y * y2,
-            yz = y * z2,
-            zz = z * z2,
-            wx = w * x2,
-            wy = w * y2,
-            wz = w * z2;
+     xx = x * x2,
+     xy = x * y2,
+     xz = x * z2,
+     yy = y * y2,
+     yz = y * z2,
+     zz = z * z2,
+     wx = w * x2,
+     wy = w * y2,
+     wz = w * z2;
 
-        dest[0] = 1 - (yy + zz);
-        dest[1] = xy + wz;
-        dest[2] = xz - wy;
-        dest[3] = 0;
-        dest[4] = xy - wz;
-        dest[5] = 1 - (xx + zz);
-        dest[6] = yz + wx;
-        dest[7] = 0;
-        dest[8] = xz + wy;
-        dest[9] = yz - wx;
-        dest[10] = 1 - (xx + yy);
-        dest[11] = 0;
-        dest[12] = vec[0];
-        dest[13] = vec[1];
-        dest[14] = vec[2];
-        dest[15] = 1;
-        
-        return dest;
-    };*/
+     dest[0] = 1 - (yy + zz);
+     dest[1] = xy + wz;
+     dest[2] = xz - wy;
+     dest[3] = 0;
+     dest[4] = xy - wz;
+     dest[5] = 1 - (xx + zz);
+     dest[6] = yz + wx;
+     dest[7] = 0;
+     dest[8] = xz + wy;
+     dest[9] = yz - wx;
+     dest[10] = 1 - (xx + yy);
+     dest[11] = 0;
+     dest[12] = vec[0];
+     dest[13] = vec[1];
+     dest[14] = vec[2];
+     dest[15] = 1;
+
+     return dest;
+     };*/
 
     /**
      * Returns a string representation of a mat4
@@ -1681,11 +1857,11 @@ define( function () {
      */
     quat4.equal = function (a, b) {
         return a === b || (
-            Math.abs(a[0] - b[0]) < FLOAT_EPSILON &&
-            Math.abs(a[1] - b[1]) < FLOAT_EPSILON &&
-            Math.abs(a[2] - b[2]) < FLOAT_EPSILON &&
-            Math.abs(a[3] - b[3]) < FLOAT_EPSILON
-        );
+                Math.abs(a[0] - b[0]) < FLOAT_EPSILON &&
+                Math.abs(a[1] - b[1]) < FLOAT_EPSILON &&
+                Math.abs(a[2] - b[2]) < FLOAT_EPSILON &&
+                Math.abs(a[3] - b[3]) < FLOAT_EPSILON
+            );
     };
 
     /**
@@ -1696,7 +1872,9 @@ define( function () {
      * @returns {quat4} dest is specified, new quat4 otherwise
      */
     quat4.identity = function (dest) {
-        if (!dest) { dest = quat4.create(); }
+        if (!dest) {
+            dest = quat4.create();
+        }
         dest[0] = 0;
         dest[1] = 0;
         dest[2] = 0;
@@ -1738,8 +1916,8 @@ define( function () {
      *
      * @return {number} Dot product of quat and quat2
      */
-    quat4.dot = function(quat, quat2){
-        return quat[0]*quat2[0] + quat[1]*quat2[1] + quat[2]*quat2[2] + quat[3]*quat2[3];
+    quat4.dot = function (quat, quat2) {
+        return quat[0] * quat2[0] + quat[1] * quat2[1] + quat[2] * quat2[2] + quat[3] * quat2[3];
     };
 
     /**
@@ -1750,24 +1928,24 @@ define( function () {
      *
      * @returns {quat4} dest if specified, quat otherwise
      */
-    quat4.inverse = function(quat, dest) {
+    quat4.inverse = function (quat, dest) {
         var q0 = quat[0], q1 = quat[1], q2 = quat[2], q3 = quat[3],
-            dot = q0*q0 + q1*q1 + q2*q2 + q3*q3,
-            invDot = dot ? 1.0/dot : 0;
-        
+            dot = q0 * q0 + q1 * q1 + q2 * q2 + q3 * q3,
+            invDot = dot ? 1.0 / dot : 0;
+
         // TODO: Would be faster to return [0,0,0,0] immediately if dot == 0
-        
-        if(!dest || quat === dest) {
+
+        if (!dest || quat === dest) {
             quat[0] *= -invDot;
             quat[1] *= -invDot;
             quat[2] *= -invDot;
             quat[3] *= invDot;
             return quat;
         }
-        dest[0] = -quat[0]*invDot;
-        dest[1] = -quat[1]*invDot;
-        dest[2] = -quat[2]*invDot;
-        dest[3] = quat[3]*invDot;
+        dest[0] = -quat[0] * invDot;
+        dest[1] = -quat[1] * invDot;
+        dest[2] = -quat[2] * invDot;
+        dest[3] = quat[3] * invDot;
         return dest;
     };
 
@@ -1818,7 +1996,9 @@ define( function () {
      * @returns {quat4} dest if specified, quat otherwise
      */
     quat4.normalize = function (quat, dest) {
-        if (!dest) { dest = quat; }
+        if (!dest) {
+            dest = quat;
+        }
 
         var x = quat[0], y = quat[1], z = quat[2], w = quat[3],
             len = Math.sqrt(x * x + y * y + z * z + w * w);
@@ -1848,17 +2028,17 @@ define( function () {
      * @returns {quat4} dest if specified, quat otherwise
      */
     quat4.add = function (quat, quat2, dest) {
-        if(!dest || quat === dest) {
+        if (!dest || quat === dest) {
             quat[0] += quat2[0];
             quat[1] += quat2[1];
             quat[2] += quat2[2];
             quat[3] += quat2[3];
             return quat;
         }
-        dest[0] = quat[0]+quat2[0];
-        dest[1] = quat[1]+quat2[1];
-        dest[2] = quat[2]+quat2[2];
-        dest[3] = quat[3]+quat2[3];
+        dest[0] = quat[0] + quat2[0];
+        dest[1] = quat[1] + quat2[1];
+        dest[2] = quat[2] + quat2[2];
+        dest[3] = quat[3] + quat2[3];
         return dest;
     };
 
@@ -1872,7 +2052,9 @@ define( function () {
      * @returns {quat4} dest if specified, quat otherwise
      */
     quat4.multiply = function (quat, quat2, dest) {
-        if (!dest) { dest = quat; }
+        if (!dest) {
+            dest = quat;
+        }
 
         var qax = quat[0], qay = quat[1], qaz = quat[2], qaw = quat[3],
             qbx = quat2[0], qby = quat2[1], qbz = quat2[2], qbw = quat2[3];
@@ -1895,12 +2077,14 @@ define( function () {
      * @returns dest if specified, vec otherwise
      */
     quat4.multiplyVec3 = function (quat, vec, dest) {
-        if (!dest) { dest = vec; }
+        if (!dest) {
+            dest = vec;
+        }
 
         var x = vec[0], y = vec[1], z = vec[2],
             qx = quat[0], qy = quat[1], qz = quat[2], qw = quat[3],
 
-            // calculate quat * vec
+        // calculate quat * vec
             ix = qw * x + qy * z - qz * y,
             iy = qw * y + qz * x - qx * z,
             iz = qw * z + qx * y - qy * x,
@@ -1924,17 +2108,17 @@ define( function () {
      * @returns {quat4} dest if specified, quat otherwise
      */
     quat4.scale = function (quat, val, dest) {
-        if(!dest || quat === dest) {
+        if (!dest || quat === dest) {
             quat[0] *= val;
             quat[1] *= val;
             quat[2] *= val;
             quat[3] *= val;
             return quat;
         }
-        dest[0] = quat[0]*val;
-        dest[1] = quat[1]*val;
-        dest[2] = quat[2]*val;
-        dest[3] = quat[3]*val;
+        dest[0] = quat[0] * val;
+        dest[1] = quat[1] * val;
+        dest[2] = quat[2] * val;
+        dest[3] = quat[3] * val;
         return dest;
     };
 
@@ -1947,7 +2131,9 @@ define( function () {
      * @returns {mat4} dest if specified, a new mat4 otherwise
      */
     quat4.toMat4 = function (quat, dest) {
-        if (!dest) { dest = mat4.create(); }
+        if (!dest) {
+            dest = mat4.create();
+        }
 
         var x = quat[0], y = quat[1], z = quat[2], w = quat[3],
             x2 = x + x,
@@ -1998,7 +2184,9 @@ define( function () {
      * @returns {quat4} dest if specified, quat otherwise
      */
     quat4.slerp = function (quat, quat2, slerp, dest) {
-        if (!dest) { dest = quat; }
+        if (!dest) {
+            dest = quat;
+        }
 
         var cosHalfTheta = quat[0] * quat2[0] + quat[1] * quat2[1] + quat[2] * quat2[2] + quat[3] * quat2[3],
             halfTheta,
@@ -2048,46 +2236,46 @@ define( function () {
      * @returns {quat4} the quaternion constructed from the rotation matrix
      *
      */
-    quat4.fromRotationMatrix = function(mat, dest) {
+    quat4.fromRotationMatrix = function (mat, dest) {
         if (!dest) dest = quat4.create();
-        
+
         // Algorithm in Ken Shoemake's article in 1987 SIGGRAPH course notes
         // article "Quaternion Calculus and Fast Animation".
 
         var fTrace = mat[0] + mat[4] + mat[8];
         var fRoot;
 
-        if ( fTrace > 0.0 ) {
+        if (fTrace > 0.0) {
             // |w| > 1/2, may as well choose w > 1/2
             fRoot = Math.sqrt(fTrace + 1.0);  // 2w
             dest[3] = 0.5 * fRoot;
-            fRoot = 0.5/fRoot;  // 1/(4w)
-            dest[0] = (mat[7]-mat[5])*fRoot;
-            dest[1] = (mat[2]-mat[6])*fRoot;
-            dest[2] = (mat[3]-mat[1])*fRoot;
+            fRoot = 0.5 / fRoot;  // 1/(4w)
+            dest[0] = (mat[7] - mat[5]) * fRoot;
+            dest[1] = (mat[2] - mat[6]) * fRoot;
+            dest[2] = (mat[3] - mat[1]) * fRoot;
         } else {
             // |w| <= 1/2
-            var s_iNext = quat4.fromRotationMatrix.s_iNext = quat4.fromRotationMatrix.s_iNext || [1,2,0];
+            var s_iNext = quat4.fromRotationMatrix.s_iNext = quat4.fromRotationMatrix.s_iNext || [1, 2, 0];
             var i = 0;
-            if ( mat[4] > mat[0] )
-              i = 1;
-            if ( mat[8] > mat[i*3+i] )
-              i = 2;
+            if (mat[4] > mat[0])
+                i = 1;
+            if (mat[8] > mat[i * 3 + i])
+                i = 2;
             var j = s_iNext[i];
             var k = s_iNext[j];
-            
-            fRoot = Math.sqrt(mat[i*3+i]-mat[j*3+j]-mat[k*3+k] + 1.0);
+
+            fRoot = Math.sqrt(mat[i * 3 + i] - mat[j * 3 + j] - mat[k * 3 + k] + 1.0);
             dest[i] = 0.5 * fRoot;
             fRoot = 0.5 / fRoot;
-            dest[3] = (mat[k*3+j] - mat[j*3+k]) * fRoot;
-            dest[j] = (mat[j*3+i] + mat[i*3+j]) * fRoot;
-            dest[k] = (mat[k*3+i] + mat[i*3+k]) * fRoot;
+            dest[3] = (mat[k * 3 + j] - mat[j * 3 + k]) * fRoot;
+            dest[j] = (mat[j * 3 + i] + mat[i * 3 + j]) * fRoot;
+            dest[k] = (mat[k * 3 + i] + mat[i * 3 + k]) * fRoot;
         }
-        
+
         return dest;
     };
 
- 
+
     /**
      * Sets a quat4 to the Identity and returns it.
      *
@@ -2096,7 +2284,7 @@ define( function () {
      *
      * @returns {quat4} dest
      */
-    quat4.identity = function(dest) {
+    quat4.identity = function (dest) {
         if (!dest) dest = quat4.create();
         dest[0] = 0;
         dest[1] = 0;
@@ -2115,18 +2303,18 @@ define( function () {
      *
      * @returns {quat4} dest
      **/
-    quat4.fromAngleAxis = function(angle, axis, dest) {
+    quat4.fromAngleAxis = function (angle, axis, dest) {
         // The quaternion representing the rotation is
         //   q = cos(A/2)+sin(A/2)*(x*i+y*j+z*k)
         if (!dest) dest = quat4.create();
-        
+
         var half = angle * 0.5;
         var s = Math.sin(half);
         dest[3] = Math.cos(half);
         dest[0] = s * axis[0];
         dest[1] = s * axis[1];
         dest[2] = s * axis[2];
-        
+
         return dest;
     };
 
@@ -2142,19 +2330,18 @@ define( function () {
      *
      * @returns {vec4} dest
      */
-    quat4.toAngleAxis = function(src, dest) {
+    quat4.toAngleAxis = function (src, dest) {
         if (!dest) dest = src;
         // The quaternion representing the rotation is
         //   q = cos(A/2)+sin(A/2)*(x*i+y*j+z*k)
 
-        var sqrlen = src[0]*src[0]+src[1]*src[1]+src[2]*src[2];
-        if (sqrlen > 0)
-        {
+        var sqrlen = src[0] * src[0] + src[1] * src[1] + src[2] * src[2];
+        if (sqrlen > 0) {
             dest[3] = 2 * Math.acos(src[3]);
             var invlen = 1.0 / Math.sqrt(sqrlen);
-            dest[0] = src[0]*invlen;
-            dest[1] = src[1]*invlen;
-            dest[2] = src[2]*invlen;
+            dest[0] = src[0] * invlen;
+            dest[1] = src[1] * invlen;
+            dest[2] = src[2] * invlen;
         } else {
             // angle is 0 (mod 2*pi), so any axis will do
             dest[3] = 0;
@@ -2162,7 +2349,7 @@ define( function () {
             dest[1] = 0;
             dest[2] = 0;
         }
-        
+
         return dest;
     };
 
@@ -2176,16 +2363,16 @@ define( function () {
     quat4.str = function (quat) {
         return '[' + quat[0] + ', ' + quat[1] + ', ' + quat[2] + ', ' + quat[3] + ']';
     };
-   
+
 
     /*
      * Exports
      */
 
-	window.vec3 = vec3;
-	window.mat4 = mat4;
-	window.quat4 = quat4;
-	
-	return mat4;
+    window.vec3 = vec3;
+    window.mat4 = mat4;
+    window.quat4 = quat4;
+
+    return mat4;
 
 });

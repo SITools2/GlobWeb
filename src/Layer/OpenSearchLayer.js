@@ -131,6 +131,10 @@ define(['../Renderer/FeatureStyle', '../Renderer/VectorRendererManager', '../Uti
 
                         var response = JSON.parse(xhr.response);
 
+                        /*if (this.transformer != undefined && typeof afterHandle == 'function') {
+                            var url = this.transformer.afterHandle(url);
+                        }*/
+
                         tileData.complete = (response.totalResults == response.features.length);
 
                         self.updateFeatures(response.features);
@@ -223,8 +227,7 @@ define(['../Renderer/FeatureStyle', '../Renderer/VectorRendererManager', '../Uti
 
             // Add feature if it doesn't exist
             //if ( !this.featuresSet.hasOwnProperty(feature.properties.identifier) )
-            if ( !this.featuresSet.hasOwnProperty(feature.id) )
-	{
+            if (!this.featuresSet.hasOwnProperty(feature.id)) {
                 this.features.push(feature);
                 featureData = {
                     index: this.features.length - 1,
@@ -233,8 +236,7 @@ define(['../Renderer/FeatureStyle', '../Renderer/VectorRendererManager', '../Uti
                 this.featuresSet[feature.properties.identifier] = featureData;
                 this.featuresSet[feature.id] = featureData;
             }
-	else
-	{
+            else {
                 //featureData = this.featuresSet[feature.properties.identifier];
                 featureData = this.featuresSet[feature.id];
 
@@ -247,7 +249,7 @@ define(['../Renderer/FeatureStyle', '../Renderer/VectorRendererManager', '../Uti
 
             // Add feature id
             //tileData.featureIds.push( feature.properties.identifier );
-            tileData.featureIds.push( feature.id );
+            tileData.featureIds.push(feature.id);
 
             // Set the identifier on the geometry
             //feature.geometry.gid = feature.properties.identifier;
@@ -295,7 +297,7 @@ define(['../Renderer/FeatureStyle', '../Renderer/VectorRendererManager', '../Uti
                     this.features[featureIt.index] = lastFeature;
                     // Update its index in the Set.
                     //this.featuresSet[ lastFeature.properties.identifier ].index = featureIt.index;
-                    this.featuresSet[ lastFeature.id ].index = featureIt.index;
+                    this.featuresSet[lastFeature.id].index = featureIt.index;
                 }
             }
         }
@@ -309,15 +311,12 @@ define(['../Renderer/FeatureStyle', '../Renderer/VectorRendererManager', '../Uti
             feature.properties.style = style;
             //var featureData = this.featuresSet[feature.properties.identifier];
             var featureData = this.featuresSet[feature.id];
-	if ( featureData )
-	{
-		for ( var i = 0; i < featureData.tiles.length; i++ )
-		{
+            if (featureData) {
+                for (var i = 0; i < featureData.tiles.length; i++) {
                     var tile = featureData.tiles[i];
                     this.globe.vectorRendererManager.removeGeometryFromTile(feature.geometry, tile);
                     this.globe.vectorRendererManager.addGeometryToTile(this, feature.geometry, style, tile);
                 }
-
             }
         }
 
@@ -338,7 +337,6 @@ define(['../Renderer/FeatureStyle', '../Renderer/VectorRendererManager', '../Uti
             if (tile.order == this.minOrder) {
                 tile.extension[this.extId] = new OSData(this, tile, null);
             }
-
         };
 
         /**************************************************************************************************************/
@@ -423,6 +421,11 @@ define(['../Renderer/FeatureStyle', '../Renderer/VectorRendererManager', '../Uti
          */
         OpenSearchLayer.prototype.buildUrl = function (tile) {
             var url = this.serviceUrl + "/search?order=" + tile.order + "&healpix=" + tile.pixelIndex;
+
+            /*if (this.transformer != undefined && typeof beforeHandle == 'function') {
+                var url = this.transformer.beforeHandle(url);
+            }*/
+
             if (this.coordSystemRequired) {
                 // OpenSearchLayer always works in equatorial
                 url += "&coordSystem=EQUATORIAL";

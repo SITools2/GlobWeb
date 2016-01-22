@@ -252,6 +252,7 @@ define(['../CoordinateSystem/CoordinateSystem', '../Renderer/RenderContext', '..
 
                 var ray = new Ray(eye, points[i]);
                 var t = ray.sphereIntersect(earthCenter, this.coordinateSystem.radius);
+                //var t = ray.sphereIntersect(earthCenter, 15);
                 if (t < 0.0)
                     return null;
                 var pos3d = ray.computePoint(t);
