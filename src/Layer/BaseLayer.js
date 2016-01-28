@@ -41,6 +41,8 @@ define(["../Utils/Event", "../Utils/Utils"], function (Event, Utils) {
         this.globe = null;
         this.name = options && options.hasOwnProperty('name') ? options['name'] : "";
         this.attribution = options && options.hasOwnProperty('attribution') ? options['attribution'] : "";
+        this.copyrightUrl = options && options.hasOwnProperty('copyrightUrl') ? options['copyrightUrl'] : "";
+        this.ack = options && options.hasOwnProperty('ack') ? options['ack'] : "";
         this.icon = options && options.hasOwnProperty('icon') ? options['icon'] : "";
         this.description = options && options.hasOwnProperty('description') ? options['description'] : "";
         this._visible = options && options.hasOwnProperty('visible') ? options['visible'] : true;

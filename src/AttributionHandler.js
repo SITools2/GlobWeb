@@ -67,7 +67,16 @@ define(function () {
      */
     AttributionHandler.prototype.addAttribution = function (layer) {
         var div = document.createElement('div');
-        div.innerHTML = layer.attribution;
+
+        var attribution;
+        var title = (layer.ack != undefined) ? layer.ack : "";
+        if (layer.copyrightUrl !== "" && layer.copyrightUrl !== undefined) {
+            attribution = '<a class="whiteLink" href="' + layer.copyrightUrl  + '" target="_blank" title="'+ title +'">' + layer.attribution + '</a>';
+        } else {
+            attribution = layer.attribution;
+        }
+
+        div.innerHTML = attribution;
         div.id = this.element.id + "_" + layer.id;
 
         if (layer.id == 0) {
