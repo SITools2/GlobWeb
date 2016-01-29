@@ -77,7 +77,8 @@ LineStringRenderable.prototype._fixDateLine = function( tile, coords )
 		}
 	}
 	newCoords.push( coords[coords.length -1] );
-	
+	//newCoords.push( coords[0] );
+
 	return lines;
 };
 
@@ -110,7 +111,6 @@ LineStringRenderable.prototype._buildVerticesAndIndices = function( tile, coords
     coords.push(coords[coords.length -1 ]);
 	// Convert lon/lat coordinates to tile coordinates (between [0,size-1] inside the tile)
 	var tileCoords = tile.lonlat2tile(coords);
-
 
 	for ( var i = 0; i < coords.length - 1; i++ )
 	{
@@ -246,11 +246,11 @@ LineStringRenderer.prototype.canApply = function(type,style)
 	if ( this.globe.isSky )
 		return false;
 
-	//return (type == "LineString" || type == "MultiLineString"
-	//						|| (!style.fill && (type == "Polygon" || type == "MultiPolygon")))
-	//					&& !style.gradientLength;
-	return (type == "LineString" || type == "MultiLineString")
+	return (type == "LineString" || type == "MultiLineString"
+							|| (!style.fill && (type == "Polygon" || type == "MultiPolygon")))
 						&& !style.gradientLength;
+	//return (type == "LineString" || type == "MultiLineString")
+	//					&& !style.gradientLength;
 }
 /**************************************************************************************************************/
 
