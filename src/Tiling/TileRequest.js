@@ -183,7 +183,8 @@ define(['./Tile', '../Utils/ImageRequest'], function (Tile, ImageRequest) {
                 }
                 else {
                     // Tile not found in cache or cache isn't activated, send the request
-                    _imageRequest.send(tileManager.imageryProvider.getUrl(tile), tileManager.imageryProvider.crossOrigin);
+                        _imageRequest.send(tileManager.imageryProvider.getUrl(tile), tileManager.imageryProvider.crossOrigin, !tileManager.imageryProvider.hasTile(tile));
+
                 }
 
             }

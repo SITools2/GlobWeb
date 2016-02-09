@@ -97,6 +97,11 @@ define(["../Utils/Event", "../Utils/Utils"], function (Event, Utils) {
         return this._visible;
     }
 
+
+    BaseLayer.prototype.hasTile = function (tile) {
+        return true;
+    };
+
     /**************************************************************************************************************/
 
     /**

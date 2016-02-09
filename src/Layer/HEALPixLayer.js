@@ -54,16 +54,16 @@ define(['../Utils/Utils', '../Tiling/HEALPixTiling', './RasterLayer'],
                 if (self.globe) {
                     self.globe.renderContext.requestFrame();
                 }
-            }
+            };
             this.levelZeroImage.onerror = function (event) {
                 self.globe.publish("baseLayersError", self);
                 self._ready = false;
 
                 console.log("Cannot load " + self.levelZeroImage.src);
-            }
+            };
 
             this._ready = false;
-        }
+        };
 
         /**************************************************************************************************************/
 
@@ -81,7 +81,17 @@ define(['../Utils/Utils', '../Tiling/HEALPixTiling', './RasterLayer'],
             if (!this._overlay) {
                 this.levelZeroImage.src = this.baseUrl + "/Norder3/Allsky." + this.format;
             }
-        }
+        };
+
+        /**
+         * Checks the tile exists.
+         * This check, when it is used, avoids to send a Http request on a no existing tile.
+         * @param tile the tile to check
+         * @returns {boolean} True when the tile exists otherwise false;
+         */
+        HEALPixLayer.prototype.hasTile = function (tile) {
+            return (tile.order <= this.numberOfLevels);
+        };
 
         /**************************************************************************************************************/
 
@@ -95,15 +105,14 @@ define(['../Utils/Utils', '../Tiling/HEALPixTiling', './RasterLayer'],
             url += tile.order;
 
             url += "/Dir";
-            var indexDirectory = Math.floor(tile.pixelIndex / 10000) * 10000;
-            url += indexDirectory;
+            url += Math.floor(tile.pixelIndex / 10000) * 10000;
 
             url += "/Npix";
             url += tile.pixelIndex;
             url += "." + this.format;
 
             return url;
-        }
+        };
 
 
         /**************************************************************************************************************/
@@ -130,20 +139,20 @@ define(['../Utils/Utils', '../Tiling/HEALPixTiling', './RasterLayer'],
 
                 // Top right
                 pi = tile.pixelIndex * 4 + 2;
-                var sx = ( pi % 27) * 64;
-                var sy = ( Math.floor(pi / 27) ) * 64;
+                sx = ( pi % 27) * 64;
+                sy = ( Math.floor(pi / 27) ) * 64;
                 context.drawImage(this.levelZeroImage, sx, sy, 64, 64, 64, 0, 64, 64);
 
                 // Bottom left
                 pi = tile.pixelIndex * 4 + 1;
-                var sx = ( pi % 27) * 64;
-                var sy = ( Math.floor(pi / 27) ) * 64;
+                sx = ( pi % 27) * 64;
+                sy = ( Math.floor(pi / 27) ) * 64;
                 context.drawImage(this.levelZeroImage, sx, sy, 64, 64, 0, 64, 64, 64);
 
                 // Bottom right
                 pi = tile.pixelIndex * 4 + 3;
-                var sx = ( pi % 27) * 64;
-                var sy = ( Math.floor(pi / 27) ) * 64;
+                sx = ( pi % 27) * 64;
+                sy = ( Math.floor(pi / 27) ) * 64;
                 context.drawImage(this.levelZeroImage, sx, sy, 64, 64, 64, 64, 64, 64);
 
                 var imgData = context.getImageData(0, 0, 128, 128);
@@ -152,7 +161,7 @@ define(['../Utils/Utils', '../Tiling/HEALPixTiling', './RasterLayer'],
                 tile.texture = tilePool.createGLTexture(imgData);
                 tile.imageSize = 128;
             }
-        }
+        };
 
         /**************************************************************************************************************/
 
