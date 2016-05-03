@@ -17,7 +17,7 @@
  * along with GlobWeb. If not, see <http://www.gnu.org/licenses/>.
  ***************************************/
 
-define(['../Utils/Utils', '../Layer/BaseLayer', '../Renderer/Program'], function (Utils, BaseLayer, Program) {
+define(['../Utils/Utils', './BaseLayer', '../Renderer/Program'], function (Utils, BaseLayer, Program) {
 
     /** @name AtmosphereLayer
      @class
@@ -30,18 +30,20 @@ define(['../Utils/Utils', '../Layer/BaseLayer', '../Renderer/Program'], function
      <li>sunBrightness : the mie parameter, default is 0.0015</li>
      <li>exposure : the exposure, use for basic high dynamic range, default is 2.0</li>
      <li>wavelength : the RGB color of the sun, default is [0.650,0.570,0.475]</li>
+     <li>lightDir : The location of the light in {x,y,z} - xAxis 0----> yAxis</li>
      </ul>
      */
     var AtmosphereLayer = function (options) {
         BaseLayer.prototype.constructor.call(this, options);
-        if (!this.name)
+        if (!this.name) {
             this.name = "Atmosphere";
-
-        this.kr = (options && options['kr']) || 0.0025;
-        this.km = (options && options['km']) || 0.0015;
-        this.sunBrightness = (options && options['sunBrightness']) || 15.0;
-        this.exposure = (options && options['exposure']) || 2.0;
-        this.wavelength = (options && options['wavelength']) || [0.650, 0.570, 0.475];
+        }
+        this.kr = (options && options.kr) || 0.0025;
+        this.km = (options && options.km) || 0.0015;
+        this.sunBrightness = (options && options.sunBrightness) || 15.0;
+        this.exposure = (options && options.exposure) || 2.0;
+        this.wavelength = (options && options.wavelength) || [0.650, 0.570, 0.475];
+        this.lightDir = (options && options.lightDir) || [1, 0, 0];
 
         // internal properties
         this._skyProgram = null;
@@ -51,7 +53,7 @@ define(['../Utils/Utils', '../Layer/BaseLayer', '../Renderer/Program'], function
 
         // For rendering
         this.zIndex = -1;
-    }
+    };
 
     /**************************************************************************************************************/
 
@@ -65,7 +67,7 @@ define(['../Utils/Utils', '../Layer/BaseLayer', '../Renderer/Program'], function
     AtmosphereLayer.prototype._attach = function (g) {
         this.globe = g;
         this._innerRadius = this.globe.coordinateSystem.radius;
-        this._outerRadius = this._innerRadius * 1.025;
+        this._outerRadius = this._innerRadius * 1.005;
         var renderContext = g.renderContext;
 
         // Setup program, uniform now that we have the render context
@@ -88,9 +90,9 @@ define(['../Utils/Utils', '../Layer/BaseLayer', '../Renderer/Program'], function
             && this._groundFromSpaceProgram.glProgram != null
             && this._groundFromAtmosphereProgram.glProgram != null;
 
-        if (!this._isValid)
+        if (!this._isValid) {
             return;
-
+        }
         this._skyFromSpaceProgram.apply();
         this._initUniforms(this._skyFromSpaceProgram.uniforms);
         this._skyFromAtmosphereProgram.apply();
@@ -108,9 +110,11 @@ define(['../Utils/Utils', '../Layer/BaseLayer', '../Renderer/Program'], function
         var nbAz = 144;
 
         // Create the vertices
-        for (var el = -nbEl; el <= nbEl; el++) {
+        var el;
+        var az;
+        for (el = -nbEl; el <= nbEl; el++) {
             var elevation = el * (Math.PI * 0.5) / nbEl;
-            for (var az = -nbAz; az <= nbAz; az++) {
+            for (az = -nbAz; az <= nbAz; az++) {
                 var azimuth = az * Math.PI / nbAz;
 
                 var x = this._outerRadius * Math.cos(azimuth) * Math.cos(elevation);
@@ -124,8 +128,8 @@ define(['../Utils/Utils', '../Layer/BaseLayer', '../Renderer/Program'], function
         }
 
         // build the sphere triangles
-        for (var el = 0; el < 2 * nbEl; el++) {
-            for (var az = 0; az < 2 * nbAz; az++) {
+        for (el = 0; el < 2 * nbEl; el++) {
+            for (az = 0; az < 2 * nbAz; az++) {
                 indices.push(el * (2 * nbAz + 1) + az);
                 indices.push((el + 1) * (2 * nbAz + 1) + az + 1);
                 indices.push(el * (2 * nbAz + 1) + az + 1);
@@ -150,7 +154,7 @@ define(['../Utils/Utils', '../Layer/BaseLayer', '../Renderer/Program'], function
 
         g.preRenderers.push(this);
         g.tileManager.addPostRenderer(this);
-    }
+    };
 
     /**************************************************************************************************************/
 
@@ -165,29 +169,28 @@ define(['../Utils/Utils', '../Layer/BaseLayer', '../Renderer/Program'], function
         var rayleighScaleDepth = 0.25;
         //var mieScaleDepth = 0.1;
 
-        var lightDir = [1.0, 1.0, 1.0];
-        vec3.normalize(lightDir);
+        vec3.normalize(this.lightDir);
 
-        gl.uniform1f(uniforms["fKrESun"], this.kr * this.sunBrightness);
-        gl.uniform1f(uniforms["fKmESun"], this.kr * this.sunBrightness);
-        gl.uniform1f(uniforms["fKr4PI"], this.kr * 4.0 * Math.PI);
-        gl.uniform1f(uniforms["fKm4PI"], this.km * 4.0 * Math.PI);
-        gl.uniform1f(uniforms["fExposure"], this.exposure);
+        gl.uniform1f(uniforms.fKrESun, this.kr * this.sunBrightness);
+        gl.uniform1f(uniforms.fKmESun, this.kr * this.sunBrightness);
+        gl.uniform1f(uniforms.fKr4PI, this.kr * 4.0 * Math.PI);
+        gl.uniform1f(uniforms.fKm4PI, this.km * 4.0 * Math.PI);
+        gl.uniform1f(uniforms.fExposure, this.exposure);
 
         var wavelength = [Math.pow(this.wavelength[0], 4.0), Math.pow(this.wavelength[1], 4.0), Math.pow(this.wavelength[2], 4.0)];
-        gl.uniform3f(uniforms["v3InvWavelength"], 1.0 / wavelength[0], 1.0 / wavelength[1], 1.0 / wavelength[2]);
+        gl.uniform3f(uniforms.v3InvWavelength, 1.0 / wavelength[0], 1.0 / wavelength[1], 1.0 / wavelength[2]);
 
-        gl.uniform3f(uniforms["v3LightPos"], lightDir[0], lightDir[1], lightDir[2]);
-        gl.uniform1f(uniforms["fInnerRadius"], this._innerRadius);
-        gl.uniform1f(uniforms["fInnerRadius2"], this._innerRadius * this._innerRadius);
-        gl.uniform1f(uniforms["fOuterRadius"], this._outerRadius);
-        gl.uniform1f(uniforms["fOuterRadius2"], this._outerRadius * this._outerRadius);
-        gl.uniform1f(uniforms["fScale"], scale);
-        gl.uniform1f(uniforms["fScaleDepth"], rayleighScaleDepth);
-        gl.uniform1f(uniforms["fScaleOverScaleDepth"], scale / rayleighScaleDepth);
-        gl.uniform1f(uniforms["g"], g);
-        gl.uniform1f(uniforms["g2"], g * g);
-    }
+        gl.uniform3f(uniforms.v3LightPos, this.lightDir[0], this.lightDir[1], this.lightDir[2]);
+        gl.uniform1f(uniforms.fInnerRadius, this._innerRadius);
+        gl.uniform1f(uniforms.fInnerRadius2, this._innerRadius * this._innerRadius);
+        gl.uniform1f(uniforms.fOuterRadius, this._outerRadius);
+        gl.uniform1f(uniforms.fOuterRadius2, this._outerRadius * this._outerRadius);
+        gl.uniform1f(uniforms.fScale, scale);
+        gl.uniform1f(uniforms.fScaleDepth, rayleighScaleDepth);
+        gl.uniform1f(uniforms.fScaleOverScaleDepth, scale / rayleighScaleDepth);
+        gl.uniform1f(uniforms.g, g);
+        gl.uniform1f(uniforms.g2, g * g);
+    };
 
     /**************************************************************************************************************/
 
@@ -195,9 +198,9 @@ define(['../Utils/Utils', '../Layer/BaseLayer', '../Renderer/Program'], function
      Pre-render the atmoshpere
      */
     AtmosphereLayer.prototype.preRender = function () {
-        if (!this._isValid)
+        if (!this._isValid) {
             return;
-
+        }
         var tileManager = this.globe.tileManager;
         if (!this._visible) {
             tileManager.program = this._originalProgram;
@@ -221,9 +224,9 @@ define(['../Utils/Utils', '../Layer/BaseLayer', '../Renderer/Program'], function
 
         this._skyProgram.apply();
 
-        gl.uniform3f(this._skyProgram.uniforms["v3CameraPos"], eyePos[0], eyePos[1], eyePos[2]);
-        gl.uniform1f(this._skyProgram.uniforms["fCameraHeight2"], eyeHeight * eyeHeight);
-        gl.uniform1f(this._skyProgram.uniforms["fCameraHeight"], eyeHeight);
+        gl.uniform3f(this._skyProgram.uniforms.v3CameraPos, eyePos[0], eyePos[1], eyePos[2]);
+        gl.uniform1f(this._skyProgram.uniforms.fCameraHeight2, eyeHeight * eyeHeight);
+        gl.uniform1f(this._skyProgram.uniforms.fCameraHeight, eyeHeight);
 
         this._groundProgram.apply();
 
@@ -231,23 +234,23 @@ define(['../Utils/Utils', '../Layer/BaseLayer', '../Renderer/Program'], function
         mat4.multiplyVec3(rc.viewMatrix, earthCenter);
         gl.uniform3f(this._groundProgram.uniforms["earthCenter"], earthCenter[0], earthCenter[1], earthCenter[2]);
 
-        var lightDir = [1.0, 1.0, 1.0];
-        vec3.normalize(lightDir);
-        var x = lightDir[0], y = lightDir[1], z = lightDir[2];
+        vec3.normalize(this.lightDir);
+        var x = this.lightDir[0], y = this.lightDir[1], z = this.lightDir[2];
         var mat = rc.viewMatrix;
-        lightDir[0] = mat[0] * x + mat[4] * y + mat[8] * z;
-        lightDir[1] = mat[1] * x + mat[5] * y + mat[9] * z;
-        lightDir[2] = mat[2] * x + mat[6] * y + mat[10] * z;
-        gl.uniform3f(this._groundProgram.uniforms["lightDir"], lightDir[0], lightDir[1], lightDir[2]);
+        var lightDirUpdated = [];
+        lightDirUpdated[0] = mat[0] * x + mat[4] * y + mat[8] * z;
+        lightDirUpdated[1] = mat[1] * x + mat[5] * y + mat[9] * z;
+        lightDirUpdated[2] = mat[2] * x + mat[6] * y + mat[10] * z;
+        gl.uniform3f(this._groundProgram.uniforms.lightDir, lightDirUpdated[0], lightDirUpdated[1], lightDirUpdated[2]);
 
-        gl.uniform3f(this._groundProgram.uniforms["v3CameraPos"], eyePos[0], eyePos[1], eyePos[2]);
-        gl.uniform1f(this._groundProgram.uniforms["fCameraHeight2"], eyeHeight * eyeHeight);
-        gl.uniform1f(this._groundProgram.uniforms["fCameraHeight"], eyeHeight);
+        gl.uniform3f(this._groundProgram.uniforms.v3CameraPos, eyePos[0], eyePos[1], eyePos[2]);
+        gl.uniform1f(this._groundProgram.uniforms.fCameraHeight2, eyeHeight * eyeHeight);
+        gl.uniform1f(this._groundProgram.uniforms.fCameraHeight, eyeHeight);
 
         tileManager.program = this._groundProgram;
 
-        rc.minFar = 2.0;
-    }
+//	rc.minFar = 2.0;
+    };
 
     /**************************************************************************************************************/
 
@@ -255,9 +258,9 @@ define(['../Utils/Utils', '../Layer/BaseLayer', '../Renderer/Program'], function
      Render the atmosphere
      */
     AtmosphereLayer.prototype.render = function () {
-        if (!this._isValid || !this._visible)
+        if (!this._isValid || !this._visible) {
             return;
-
+        }
         var rc = this.globe.renderContext;
         var gl = rc.gl;
 
@@ -274,7 +277,7 @@ define(['../Utils/Utils', '../Layer/BaseLayer', '../Renderer/Program'], function
         gl.drawElements(gl.TRIANGLES, this._numIndices, gl.UNSIGNED_SHORT, 0);
 
         gl.disable(gl.CULL_FACE);
-    }
+    };
 
     /**************************************************************************************************************/
 
