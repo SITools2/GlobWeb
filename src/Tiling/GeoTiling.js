@@ -17,7 +17,7 @@
  * along with GlobWeb. If not, see <http://www.gnu.org/licenses/>.
  ***************************************/
 
-define(['../Utils/Utils', './Tile', '../Renderer/GeoBound'], function (Utils, Tile, GeoBound) {
+define(['../Utils/Utils', './Tile', '../Renderer/GeoBound', './HEALPixBase'], function (Utils, Tile, GeoBound, HEALPixBase) {
 
     /**************************************************************************************************************/
 
@@ -174,6 +174,28 @@ define(['../Utils/Utils', './Tile', '../Renderer/GeoBound'], function (Utils, Ti
         }
 
         return tileIndices;
+    }
+
+    /**************************************************************************************************************/
+
+    /**
+     Return tile of given longitude/latitude from tiles array if exists, null otherwise
+     */
+    GeoTiling.prototype.findInsideTile = function (lon, lat, tiles) {
+        var coordSystem = mizar.getScene().coordinateSystem;
+        if (coordSystem.type != "EQ") {
+            var geo = coordSystem.convert([lon, lat], 'EQ', coordSystem.type);
+            lon = geo[0];
+            lat = geo[1];
+        }
+
+        for (var i = 0; i < tiles.length; i++) {
+            var tile = tiles[i];
+            var index = HEALPixBase.lonLat2pix(tile.order, lon, lat);
+            if (index == tile.pixelIndex)
+                return tile;
+        }
+        return null;
     }
 
     /**************************************************************************************************************/

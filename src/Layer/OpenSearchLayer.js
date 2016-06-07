@@ -131,12 +131,7 @@ define(['../Renderer/FeatureStyle', '../Renderer/VectorRendererManager', '../Uti
 
                         var response = JSON.parse(xhr.response);
 
-                        /*if (this.transformer != undefined && typeof afterHandle == 'function') {
-                            var url = this.transformer.afterHandle(url);
-                        }*/
-
                         tileData.complete = (response.totalResults == response.features.length);
-
                         self.updateFeatures(response.features);
 
                         for (var i = response.features.length - 1; i >= 0; i--) {
@@ -157,13 +152,14 @@ define(['../Renderer/FeatureStyle', '../Renderer/VectorRendererManager', '../Uti
                     else if (xhr.status >= 400) {
                         tileData.complete = true;
                         console.error(xhr.responseText);
+                        return;
                     }
 
                     tileData.state = OpenSearchLayer.TileState.LOADED;
                     self.freeRequests.push(xhr);
 
                     // Publish event that layer have received new features
-                    if (response.features.length > 0) {
+                    if (response.features != null && response.features.length > 0) {
                         self.publish("features:added", {layer: self, features: response.features});
                     }
 
